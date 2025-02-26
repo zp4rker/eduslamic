@@ -1,0 +1,29 @@
+{
+  "name": "eduslamic",
+  "version": "1.0.0",
+  "description": "A school management system, but Islām-focused",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zp4rker/eduslamic.git"
+  },
+  "author": "abulujayn",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/zp4rker/eduslamic/issues"
+  },
+  "homepage": "https://github.com/zp4rker/eduslamic#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "hbs": "^4.2.0",
+    "mysql2": "^3.12.0",
+    "nodemon": "^3.1.9"
+  }
+}
