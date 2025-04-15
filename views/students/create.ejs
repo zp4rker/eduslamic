@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Student - Education CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-name {
+            margin-right: 15px;
+        }
+        .logout-btn, .back-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .logout-btn:hover, .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        .col-50 {
+            flex: 0 0 50%;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        @media (max-width: 768px) {
+            .col-50 {
+                flex: 0 0 100%;
+            }
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Education CRM</h1>
+        <div class="user-info">
+            <span class="user-name">Welcome, <%= user.name %></span>
+            <a href="/students" class="back-btn">Back to Students</a>
+            <a href="/auth/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <% if (error) { %>
+            <div class="message error">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <div class="card">
+            <h2>Create New Student</h2>
+            
+            <form action="/students/create" method="POST">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input 
+                        type="text" 
+                        id="firstName" 
+                        name="firstName" 
+                        value="<%= values.firstName || '' %>" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input 
+                        type="text" 
+                        id="lastName" 
+                        name="lastName" 
+                        value="<%= values.lastName || '' %>" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        value="<%= values.email || '' %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        value="<%= values.phone || '' %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth</label>
+                    <input 
+                        type="date" 
+                        id="dateOfBirth" 
+                        name="dateOfBirth" 
+                        value="<%= values.dateOfBirth || '' %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea 
+                        id="address" 
+                        name="address"
+                    ><%= values.address || '' %></textarea>
+                </div>
+                
+                <h3>Parent/Guardian Information</h3>
+                
+                <div class="row">
+                    <div class="col-50">
+                        <div class="form-group">
+                            <label for="parentName">Parent/Guardian Name</label>
+                            <input 
+                                type="text" 
+                                id="parentName" 
+                                name="parentName" 
+                                value="<%= values.parentName || '' %>"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-50">
+                        <div class="form-group">
+                            <label for="parentEmail">Parent/Guardian Email</label>
+                            <input 
+                                type="email" 
+                                id="parentEmail" 
+                                name="parentEmail" 
+                                value="<%= values.parentEmail || '' %>"
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-50">
+                        <div class="form-group">
+                            <label for="parentPhone">Parent/Guardian Phone</label>
+                            <input 
+                                type="tel" 
+                                id="parentPhone" 
+                                name="parentPhone" 
+                                value="<%= values.parentPhone || '' %>"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-50">
+                        <div class="form-group">
+                            <label for="relationship">Relationship</label>
+                            <input 
+                                type="text" 
+                                id="relationship" 
+                                name="relationship" 
+                                value="<%= values.relationship || '' %>"
+                                placeholder="e.g., Father, Mother, Guardian"
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea 
+                        id="notes" 
+                        name="notes"
+                    ><%= values.notes || '' %></textarea>
+                </div>
+                
+                <button type="submit">Create Student</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

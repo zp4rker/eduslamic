@@ -47,14 +47,22 @@ db.createIndex({
 // Routes
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
+const studentRoutes = require('./routes/students');
+const classRoutes = require('./routes/classes');
 
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
+app.use('/students', studentRoutes);
+app.use('/classes', classRoutes);
 
 // Home route
 app.get('/', (req, res) => {
   if (req.session.user) {
-    res.render('dashboard', { user: req.session.user });
+    res.render('dashboard', { 
+      user: req.session.user,
+      success: req.query.success,
+      error: req.query.error
+    });
   } else {
     res.render('login');
   }

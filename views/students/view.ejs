@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Student - Education CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-name {
+            margin-right: 15px;
+        }
+        .logout-btn, .back-btn, .edit-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .logout-btn:hover, .back-btn:hover, .edit-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            min-width: 150px;
+            color: #555;
+        }
+        .info-value {
+            flex: 1;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 4px;
+            margin: 2px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-edit {
+            background-color: #2196F3;
+        }
+        .btn-edit:hover {
+            background-color: #0b7dda;
+        }
+        .section-title {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .no-data {
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Education CRM</h1>
+        <div class="user-info">
+            <span class="user-name">Welcome, <%= user.name %></span>
+            <a href="/students" class="back-btn">Back to Students</a>
+            <a href="/students/edit/<%= student._id %>" class="edit-btn">Edit Student</a>
+            <a href="/auth/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Student Details</h2>
+            
+            <div class="info-section">
+                <div class="info-row">
+                    <div class="info-label">Name:</div>
+                    <div class="info-value"><%= student.name %></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Date of Birth:</div>
+                    <div class="info-value"><%= student.formattedDob || 'Not specified' %></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Created:</div>
+                    <div class="info-value"><%= new Date(student.createdAt).toLocaleString() %></div>
+                </div>
+                <% if(student.updatedAt) { %>
+                <div class="info-row">
+                    <div class="info-label">Last Updated:</div>
+                    <div class="info-value"><%= new Date(student.updatedAt).toLocaleString() %></div>
+                </div>
+                <% } %>
+            </div>
+            
+            <h3 class="section-title">Parents</h3>
+            <% if(student.parents && student.parents.length > 0) { %>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% student.parents.forEach(parent => { %>
+                            <tr>
+                                <td><%= parent.name %></td>
+                                <td><%= parent.email %></td>
+                                <td><%= parent.phone || 'Not specified' %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p class="no-data">No parents linked to this student.</p>
+            <% } %>
+            
+            <h3 class="section-title">Enrolled Classes</h3>
+            <% if(student.classes && student.classes.length > 0) { %>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Class Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% student.classes.forEach(classObj => { %>
+                            <tr>
+                                <td><%= classObj.name %></td>
+                                <td><%= classObj.description || 'No description' %></td>
+                                <td>
+                                    <a href="/classes/view/<%= classObj._id %>" class="btn">View Class</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p class="no-data">Student is not enrolled in any classes.</p>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
