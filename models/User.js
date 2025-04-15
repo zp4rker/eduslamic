@@ -5,10 +5,17 @@ PouchDB.plugin(require('pouchdb-find'));
 
 const db = new PouchDB('users');
 
+// Define valid roles
+const ROLES = {
+  ADMIN: 'admin',
+  TEACHER: 'teacher',
+  PARENT: 'parent'
+};
+
 class User {
   /**
    * Create a new user
-   * @param {Object} userData - User data including name, email, phone, and password
+   * @param {Object} userData - User data including name, email, phone, password, and role
    * @returns {Promise<Object>} - The created user object
    */
   static async create(userData) {
@@ -23,6 +30,11 @@ class User {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(userData.password, salt);
 
+      // Validate role or set default to parent
+      const role = userData.role && Object.values(ROLES).includes(userData.role) 
+        ? userData.role 
+        : ROLES.PARENT;
+
       // Create user document with UUID (no prefix)
       const user = {
         _id: uuidv4(),
@@ -30,6 +42,7 @@ class User {
         email: userData.email,
         phone: userData.phone,
         password: hashedPassword,
+        role: role,
         createdAt: new Date().toISOString()
       };
 
@@ -94,7 +107,7 @@ class User {
   /**
    * Update user information
    * @param {string} userId - User's ID
-   * @param {Object} updateData - Data to update (name, email, phone)
+   * @param {Object} updateData - Data to update (name, email, phone, role)
    * @returns {Promise<Object>} - The updated user object
    */
   static async updateProfile(userId, updateData) {
@@ -110,10 +123,18 @@ class User {
         }
       }
       
+      // Validate role if provided
+      if (updateData.role && !Object.values(ROLES).includes(updateData.role)) {
+        throw new Error('Invalid role provided');
+      }
+      
       // Update user properties
       user.name = updateData.name || user.name;
       user.email = updateData.email || user.email;
       user.phone = updateData.phone || user.phone;
+      if (updateData.role) {
+        user.role = updateData.role;
+      }
       user.updatedAt = new Date().toISOString();
       
       // Save the updated document
@@ -179,6 +200,62 @@ class User {
       throw error;
     }
   }
+
+  /**
+   * Find users by role
+   * @param {string} role - Role to filter by
+   * @returns {Promise<Array<Object>>} - Array of users with the given role
+   */
+  static async findByRole(role) {
+    try {
+      if (!Object.values(ROLES).includes(role)) {
+        throw new Error('Invalid role');
+      }
+
+      const result = await db.find({
+        selector: { role: role }
+      });
+
+      return result.docs.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user has a specific role
+   * @param {string} userId - User's ID
+   * @param {string} role - Role to check
+   * @returns {Promise<boolean>} - True if user has the role, false otherwise
+   */
+  static async hasRole(userId, role) {
+    try {
+      const user = await this.findById(userId);
+      return user && user.role === role;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Check if user is an admin
+   * @param {string} userId - User's ID
+   * @returns {Promise<boolean>} - True if user is admin, false otherwise
+   */
+  static async isAdmin(userId) {
+    return this.hasRole(userId, ROLES.ADMIN);
+  }
+
+  /**
+   * Get all valid roles
+   * @returns {Object} - Object containing all valid roles
+   */
+  static getRoles() {
+    return ROLES;
+  }
 }
 
-module.exports = User;
+module.exports = { User, ROLES };

@@ -104,6 +104,37 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .role-admin {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .role-teacher {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .role-parent {
+            background-color: #fff3cd;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
@@ -130,7 +161,26 @@
         <% } %>
         
         <div class="card">
-            <h2>Edit Profile Information</h2>
+            <h2>Profile Information</h2>
+            
+            <% 
+            let roleBadgeClass = '';
+            switch(user.role) {
+                case 'admin':
+                    roleBadgeClass = 'role-admin';
+                    break;
+                case 'teacher':
+                    roleBadgeClass = 'role-teacher';
+                    break;
+                default:
+                    roleBadgeClass = 'role-parent';
+            }
+            %>
+            
+            <div class="role-badge <%= roleBadgeClass %>">
+                <%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>
+            </div>
+            
             <form action="/profile/update" method="POST">
                 <div class="form-group">
                     <label for="name">Full Name</label>

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const { User, ROLES } = require('../models/User');
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
@@ -10,6 +10,14 @@ const isAuthenticated = (req, res, next) => {
   res.redirect('/auth/login');
 };
 
+// Middleware to check if user is admin
+const isAdmin = (req, res, next) => {
+  if (req.session.user && req.session.user.role === ROLES.ADMIN) {
+    return next();
+  }
+  res.redirect('/');
+};
+
 /**
  * Get profile edit page
  * GET /profile/edit
@@ -17,6 +25,7 @@ const isAuthenticated = (req, res, next) => {
 router.get('/edit', isAuthenticated, (req, res) => {
   res.render('profile', {
     user: req.session.user,
+    roles: ROLES,
     success: req.query.success,
     error: req.query.error
   });
@@ -70,6 +79,35 @@ router.post('/password', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('Password update error:', error);
     res.redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+  }
+});
+
+/**
+ * Admin only: Update user role
+ * POST /profile/role/:userId
+ */
+router.post('/role/:userId', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { role } = req.body;
+    const userId = req.params.userId;
+    
+    // Validate role
+    if (!Object.values(ROLES).includes(role)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+    
+    // Update user role
+    const updatedUser = await User.updateProfile(userId, { role });
+    
+    // If updating own role, update session
+    if (userId === req.session.user._id) {
+      req.session.user = updatedUser;
+    }
+    
+    res.redirect('/?success=User role updated successfully');
+  } catch (error) {
+    console.error('Role update error:', error);
+    res.redirect(`/?error=${encodeURIComponent(error.message)}`);
   }
 });
 

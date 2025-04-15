@@ -36,7 +36,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -114,6 +114,17 @@
                     value="<%= typeof values !== 'undefined' && values.phone ? values.phone : '' %>" 
                     required
                 >
+            </div>
+            
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="parent" <%= typeof values !== 'undefined' && values.role === 'parent' ? 'selected' : '' %>>Parent</option>
+                    <option value="teacher" <%= typeof values !== 'undefined' && values.role === 'teacher' ? 'selected' : '' %>>Teacher</option>
+                    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                        <option value="admin" <%= typeof values !== 'undefined' && values.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                    <% } %>
+                </select>
             </div>
             
             <div class="form-group">

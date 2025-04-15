@@ -1,4 +1,4 @@
-const User = require('./User');
+const { User, ROLES } = require('./User');
 
 /**
  * Creates a default admin user if it doesn't exist
@@ -17,13 +17,15 @@ async function setupDefaultUser() {
         name: 'Admin User',
         email: defaultEmail,
         phone: '1234567890',
-        password: 'admin123'
+        password: 'admin123',
+        role: ROLES.ADMIN
       };
       
       await User.create(defaultUser);
       console.log('Default admin user created successfully');
       console.log('Email: admin@example.com');
       console.log('Password: admin123');
+      console.log('Role: Admin');
     } else {
       console.log('Default admin user already exists');
     }
