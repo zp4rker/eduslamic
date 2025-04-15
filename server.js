@@ -6,7 +6,7 @@ const PouchDB = require('pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
 
 // Import setup default user function
-const setupDefaultUser = require('./models/setupDefaultUser');
+const setupDefaultUser = require('./models/setupDefaultUsers');
 
 // Initialize express app
 const app = express();
@@ -38,7 +38,7 @@ db.createIndex({
   
   // Create default admin user after index is created
   setupDefaultUser().then(() => {
-    console.log('Default user setup complete');
+    console.log('Default users setup complete');
   });
 }).catch(err => {
   console.error('Error creating index:', err);
