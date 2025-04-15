@@ -46,7 +46,10 @@ db.createIndex({
 
 // Routes
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
+
 app.use('/auth', authRoutes);
+app.use('/profile', profileRoutes);
 
 // Home route
 app.get('/', (req, res) => {

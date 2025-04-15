@@ -30,7 +30,7 @@
         .user-name {
             margin-right: 15px;
         }
-        .logout-btn {
+        .logout-btn, .edit-profile-btn {
             background-color: transparent;
             border: 1px solid white;
             color: white;
@@ -38,8 +38,9 @@
             border-radius: 3px;
             cursor: pointer;
             text-decoration: none;
+            margin-left: 10px;
         }
-        .logout-btn:hover {
+        .logout-btn:hover, .edit-profile-btn:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
         .container {
@@ -76,6 +77,15 @@
             font-weight: bold;
             color: #555;
         }
+        .edit-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .edit-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +93,7 @@
         <h1>Education CRM</h1>
         <div class="user-info">
             <span class="user-name">Welcome, <%= user.name %></span>
+            <a href="/profile/edit" class="edit-profile-btn">Edit Profile</a>
             <a href="/auth/logout" class="logout-btn">Logout</a>
         </div>
     </div>
@@ -111,6 +122,7 @@
                 <div class="label">Joined:</div>
                 <div><%= new Date(user.createdAt).toLocaleDateString() %></div>
             </div>
+            <a href="/profile/edit" class="edit-link">Edit your profile information</a>
         </div>
     </div>
 </body>
