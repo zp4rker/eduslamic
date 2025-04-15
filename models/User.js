@@ -1,5 +1,6 @@
 const PouchDB = require('pouchdb');
 const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 PouchDB.plugin(require('pouchdb-find'));
 
 const db = new PouchDB('users');
@@ -22,9 +23,9 @@ class User {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-      // Create user document
+      // Create user document with UUID (no prefix)
       const user = {
-        _id: `user_${Date.now()}`,
+        _id: uuidv4(),
         name: userData.name,
         email: userData.email,
         phone: userData.phone,
