@@ -22,9 +22,7 @@ h2 {
     color: #333;
     margin-bottom: 20px;
 }
-.form-group {
-    margin-bottom: 15px;
-}
+/* Removed .form-group (now in main.css) */
 label {
     display: block;
     margin-bottom: 5px;
