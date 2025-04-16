@@ -5,8 +5,8 @@ const path = require('path');
 const PouchDB = require('pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
 
-// Import setup default user function
-const setupDefaultUser = require('./models/setupDefaultUsers');
+// Insert sample data for development/testing
+const setupDefaultUser = require('./initSampleData');
 
 // Initialize express app
 const app = express();
