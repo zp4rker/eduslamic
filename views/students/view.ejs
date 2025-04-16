@@ -4,93 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Student - Education CRM</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="/styles/students.css">
+    <link rel="stylesheet" href="/styles/tailwind.css">
 </head>
-<body>
-    <div class="header">
-        <h1>Education CRM</h1>
-        <div class="user-info">
-            <span class="user-name">Welcome, <%= user.name %></span>
-            <a href="/students" class="back-btn">Back to Students</a>
-            <a href="/students/edit/<%= student._id %>" class="edit-btn">Edit Student</a>
-            <a href="/auth/logout" class="logout-btn">Logout</a>
+<body class="bg-gray-50 min-h-screen">
+    <div class="bg-green-600 text-white px-6 py-4 flex items-center justify-between">
+        <h1 class="text-2xl font-bold">Education CRM</h1>
+        <div class="flex items-center space-x-4">
+            <a href="/students" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150">Back to Students</a>
+            <a href="/students/edit/<%= student._id %>" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150">Edit Student</a>
+            <a href="/auth/logout" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150">Logout</a>
         </div>
     </div>
-    
-    <div class="container">
-        <div class="card">
-            <h2>Student Details</h2>
-            
-            <div class="info-section">
-                <div class="info-row">
-                    <div class="info-label">Name:</div>
-                    <div class="info-value"><%= student.name %></div>
+    <div class="max-w-5xl mx-auto mt-8 px-4">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 mb-8">
+            <h2 class="text-xl font-semibold mb-6 text-gray-800">Student Details</h2>
+            <div class="space-y-4 mb-8">
+                <div class="flex flex-wrap gap-4">
+                    <div class="w-full md:w-1/2">
+                        <div class="mb-2"><span class="font-medium text-gray-700">Name:</span> <span><%= student.name %></span></div>
+                        <div class="mb-2"><span class="font-medium text-gray-700">Date of Birth:</span> <span><%= student.formattedDob || 'Not specified' %></span></div>
+                        <div class="mb-2"><span class="font-medium text-gray-700">Created:</span> <span><%= new Date(student.createdAt).toLocaleString() %></span></div>
+                        <% if(student.updatedAt) { %>
+                        <div class="mb-2"><span class="font-medium text-gray-700">Last Updated:</span> <span><%= new Date(student.updatedAt).toLocaleString() %></span></div>
+                        <% } %>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">Date of Birth:</div>
-                    <div class="info-value"><%= student.formattedDob || 'Not specified' %></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Created:</div>
-                    <div class="info-value"><%= new Date(student.createdAt).toLocaleString() %></div>
-                </div>
-                <% if(student.updatedAt) { %>
-                <div class="info-row">
-                    <div class="info-label">Last Updated:</div>
-                    <div class="info-value"><%= new Date(student.updatedAt).toLocaleString() %></div>
-                </div>
-                <% } %>
             </div>
-            
-            <h3 class="section-title">Parents</h3>
+            <h3 class="text-lg font-semibold mt-8 mb-2 text-gray-800">Parents</h3>
             <% if(student.parents && student.parents.length > 0) { %>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% student.parents.forEach(parent => { %>
-                            <tr>
-                                <td><%= parent.name %></td>
-                                <td><%= parent.email %></td>
-                                <td><%= parent.phone || 'Not specified' %></td>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Name</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Email</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Phone</th>
                             </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% student.parents.forEach(parent => { %>
+                                <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                    <td class="px-4 py-2"><%= parent.name %></td>
+                                    <td class="px-4 py-2"><%= parent.email %></td>
+                                    <td class="px-4 py-2"><%= parent.phone || 'Not specified' %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
             <% } else { %>
-                <p class="no-data">No parents linked to this student.</p>
+                <p class="text-gray-600 italic mb-8">No parents linked to this student.</p>
             <% } %>
-            
-            <h3 class="section-title">Enrolled Classes</h3>
+            <h3 class="text-lg font-semibold mt-8 mb-2 text-gray-800">Enrolled Classes</h3>
             <% if(student.classes && student.classes.length > 0) { %>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Class Name</th>
-                            <th>Description</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% student.classes.forEach(classObj => { %>
-                            <tr>
-                                <td><%= classObj.name %></td>
-                                <td><%= classObj.description || 'No description' %></td>
-                                <td>
-                                    <a href="/classes/view/<%= classObj._id %>" class="btn">View Class</a>
-                                </td>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Class Name</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Description</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
                             </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% student.classes.forEach(classObj => { %>
+                                <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                    <td class="px-4 py-2"><%= classObj.name %></td>
+                                    <td class="px-4 py-2"><%= classObj.description || 'No description' %></td>
+                                    <td class="px-4 py-2">
+                                        <a href="/classes/view/<%= classObj._id %>" class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-150">View Class</a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
             <% } else { %>
-                <p class="no-data">Student is not enrolled in any classes.</p>
+                <p class="text-gray-600 italic">Student is not enrolled in any classes.</p>
             <% } %>
         </div>
     </div>
