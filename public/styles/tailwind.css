@@ -585,9 +585,6 @@ video {
 .h-24 {
   height: 6rem;
 }
-.max-h-52 {
-  max-height: 13rem;
-}
 .min-h-screen {
   min-height: 100vh;
 }
@@ -655,9 +652,6 @@ video {
 }
 .overflow-x-auto {
   overflow-x: auto;
-}
-.overflow-y-auto {
-  overflow-y: auto;
 }
 .rounded {
   border-radius: 0.25rem;
@@ -745,9 +739,6 @@ video {
 .bg-yellow-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(234 179 8 / var(--tw-bg-opacity, 1));
-}
-.p-3 {
-  padding: 0.75rem;
 }
 .p-8 {
   padding: 2rem;
