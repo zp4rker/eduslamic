@@ -6,14 +6,15 @@
     <title>Dashboard - Education CRM</title>
     <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="/styles/dashboard.css">
+    <link rel="stylesheet" href="/styles/tailwind.css">
 </head>
 <body>
     <div class="header">
         <h1>Education CRM</h1>
         <div class="user-info">
             <span class="user-name">Welcome, <%= user.name %></span>
-            <a href="/profile/edit" class="edit-profile-btn">Edit Profile</a>
-            <a href="/auth/logout" class="logout-btn">Logout</a>
+            <a href="/profile/edit" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150 mr-2">Edit Profile</a>
+            <a href="/auth/logout" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150">Logout</a>
         </div>
     </div>
     
@@ -30,87 +31,66 @@
             </div>
         <% } %>
         
-        <div class="welcome-card">
-            <h2>Welcome to your Education CRM Dashboard</h2>
-            <p>This is your personalized dashboard for the education CRM system.</p>
-        </div>
-        
-        <div class="info-card">
-            <h2>Your Profile</h2>
-            <div class="user-details">
-                <div class="label">Name:</div>
-                <div><%= user.name %></div>
-                
-                <div class="label">Email:</div>
-                <div><%= user.email %></div>
-                
-                <div class="label">Phone:</div>
-                <div><%= user.phone %></div>
-                
-                <div class="label">Role:</div>
-                <div>
-                    <% 
-                    let roleBadgeClass = '';
-                    switch(user.role) {
-                        case 'admin':
-                            roleBadgeClass = 'role-admin';
-                            break;
-                        case 'teacher':
-                            roleBadgeClass = 'role-teacher';
-                            break;
-                        default:
-                            roleBadgeClass = 'role-parent';
-                    }
-                    %>
-                    <span class="role-badge <%= roleBadgeClass %>">
-                        <%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>
-                    </span>
-                </div>
-                
-                <div class="label">User ID:</div>
-                <div><%= user._id %></div>
-                
-                <div class="label">Joined:</div>
-                <div><%= new Date(user.createdAt).toLocaleDateString() %></div>
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 space-y-3">
+            <h2 class="text-xl font-semibold">Your Profile</h2>
+            <% 
+            let roleBadgeClass = '';
+            switch(user.role) {
+                case 'admin':
+                    roleBadgeClass = 'role-admin';
+                    break;
+                case 'teacher':
+                    roleBadgeClass = 'role-teacher';
+                    break;
+                default:
+                    roleBadgeClass = 'role-parent';
+            }
+            %>
+            <div class="user-details flex flex-col gap-2 text-base">
+                <p><span class="font-medium text-gray-600">Name:</span> <span><%= user.name %></span></p>
+                <p><span class="font-medium text-gray-600">Email:</span> <span><%= user.email %></span></p>
+                <p><span class="font-medium text-gray-600">Phone:</span> <span><%= user.phone %></span></p>
+                <p><span class="font-medium text-gray-600">Role:</span> <span class="role-badge <%= roleBadgeClass %>"><%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %></span></p>
+                <p><span class="font-medium text-gray-600">User ID:</span> <span><%= user._id %></span></p>
+                <p><span class="font-medium text-gray-600">Joined:</span> <span><%= new Date(user.createdAt).toLocaleDateString() %></span></p>
             </div>
-            <a href="/profile/edit" class="edit-link">Edit your profile information</a>
         </div>
         
         <!-- Role-specific content -->
-        <div class="role-section">
+        <div class="role-section mt-8 space-y-6">
             <% if (user.role === 'admin') { %>
-                <div class="info-card">
-                    <h2>Admin Actions</h2>
-                    <p>As an administrator, you have exclusive access to user management:</p>
-                    <div>
-                        <a href="/auth/register" class="action-button">Create New User</a>
-                        <a href="/students" class="action-button">Manage Students</a>
-                        <a href="/classes" class="action-button">Manage Classes</a>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-3">
+                    <h2 class="text-xl font-semibold">Admin Actions</h2>
+                    <p class="text-base">As an administrator, you have exclusive access to user management:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="/auth/register" class="inline-block px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Create New User</a>
+                        <a href="/students" class="inline-block px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Manage Students</a>
+                        <a href="/classes" class="inline-block px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Manage Classes</a>
                         <!-- Add more admin actions here as you expand the CRM -->
                     </div>
                 </div>
             <% } %>
             
             <% if (user.role === 'teacher') { %>
-                <div class="info-card">
-                    <h2>Teacher Dashboard</h2>
-                    <p>Welcome to your teacher dashboard. Here you can manage your classes and students.</p>
-                    <div>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-3">
+                    <h2 class="text-xl font-semibold">Teacher Dashboard</h2>
+                    <p class="text-base">Welcome to your teacher dashboard. Here you can manage your classes and students.</p>
+                    <div class="flex flex-wrap gap-2">
                         <!-- Add teacher specific actions here as you expand the CRM -->
-                        <button class="action-button" disabled>View My Classes</button>
-                        <button class="action-button" disabled>Student Records</button>
+                        <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>View My Classes</button>
+                        <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>Student Records</button>
                     </div>
                 </div>
             <% } %>
             
             <% if (user.role === 'parent') { %>
-                <div class="info-card">
-                    <h2>Parent Dashboard</h2>
-                    <p>Welcome to your parent dashboard. Here you can view your children's progress and communicate with teachers.</p>
-                    <div>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-3">
+                    <h2 class="text-xl font-semibold">Parent Dashboard</h2>
+                    <p class="text-base">Welcome to your parent dashboard. Here you can view your children's progress and communicate with teachers.</p>
+                    <div class="flex flex-wrap gap-2">
                         <!-- Add parent specific actions here as you expand the CRM -->
-                        <button class="action-button" disabled>View My Children</button>
-                        <button class="action-button" disabled>Message Teachers</button>
+                        <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>View My Children</button>
+                        <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>Message Teachers</button>
                     </div>
                 </div>
             <% } %>
