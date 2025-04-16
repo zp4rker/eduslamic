@@ -27,10 +27,8 @@
             </div>
         <% } %>
         <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 mb-8 space-y-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-semibold">Student Management</h2>
-                <a href="/students/create" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Add New Student</a>
-            </div>
+            <h2 class="text-xl font-semibold">Student Management</h2>
+            <a href="/students/create" class="mt-2 inline-block px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Add New Student</a>
             <% if (students && students.length > 0) { %>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg">
