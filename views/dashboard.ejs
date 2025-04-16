@@ -28,8 +28,8 @@
             </div>
         <% } %>
         
-        <div class="bg-white border border-gray-200 rounded-lg shadow-md p-6 mb-6 space-y-3">
-            <h2 class="text-xl font-semibold">Your Profile</h2>
+        <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 mb-8 space-y-6">
+            <h2 class="text-xl font-semibold mb-6">Your Profile</h2>
             <% 
             let roleBadgeClass = '';
             switch(user.role) {
@@ -54,11 +54,11 @@
         </div>
         
         <!-- Role-specific content -->
-        <div class="mt-8 space-y-6">
+        <div class="mt-8 space-y-8">
             <% if (user.role === 'admin') { %>
-                <div class="bg-white border border-gray-200 rounded-lg shadow-md p-6 space-y-3">
-                    <h2 class="text-xl font-semibold">Admin Actions</h2>
-                    <p class="text-base">As an administrator, you have exclusive access to user management:</p>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 space-y-6">
+                    <h2 class="text-xl font-semibold mb-6">Admin Actions</h2>
+                    <p class="text-base mb-4">As an administrator, you have exclusive access to user management:</p>
                     <div class="flex flex-wrap gap-2">
                         <a href="/auth/register" class="inline-block px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Create New User</a>
                         <a href="/students" class="inline-block px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition-colors duration-150">Manage Students</a>
@@ -69,9 +69,9 @@
             <% } %>
             
             <% if (user.role === 'teacher') { %>
-                <div class="bg-white border border-gray-200 rounded-lg shadow-md p-6 space-y-3">
-                    <h2 class="text-xl font-semibold">Teacher Dashboard</h2>
-                    <p class="text-base">Welcome to your teacher dashboard. Here you can manage your classes and students.</p>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 space-y-6">
+                    <h2 class="text-xl font-semibold mb-6">Teacher Dashboard</h2>
+                    <p class="text-base mb-4">Welcome to your teacher dashboard. Here you can manage your classes and students.</p>
                     <div class="flex flex-wrap gap-2">
                         <!-- Add teacher specific actions here as you expand the CRM -->
                         <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>View My Classes</button>
@@ -81,9 +81,9 @@
             <% } %>
             
             <% if (user.role === 'parent') { %>
-                <div class="bg-white border border-gray-200 rounded-lg shadow-md p-6 space-y-3">
-                    <h2 class="text-xl font-semibold">Parent Dashboard</h2>
-                    <p class="text-base">Welcome to your parent dashboard. Here you can view your children's progress and communicate with teachers.</p>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 space-y-6">
+                    <h2 class="text-xl font-semibold mb-6">Parent Dashboard</h2>
+                    <p class="text-base mb-4">Welcome to your parent dashboard. Here you can view your children's progress and communicate with teachers.</p>
                     <div class="flex flex-wrap gap-2">
                         <!-- Add parent specific actions here as you expand the CRM -->
                         <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>View My Children</button>
