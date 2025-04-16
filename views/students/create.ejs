@@ -4,152 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Student - Education CRM</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="/styles/students.css">
+    <link rel="stylesheet" href="/styles/tailwind.css">
 </head>
-<body>
-    <div class="header">
-        <h1>Education CRM</h1>
-        <div class="user-info">
-            <span class="user-name">Welcome, <%= user.name %></span>
-            <a href="/students" class="back-btn">Back to Students</a>
-            <a href="/auth/logout" class="logout-btn">Logout</a>
+<body class="bg-gray-50 min-h-screen">
+    <div class="bg-green-600 text-white px-6 py-4 flex items-center justify-between">
+        <h1 class="text-2xl font-bold">Education CRM</h1>
+        <div class="flex items-center space-x-4">
+            <a href="/students" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150">Back to Students</a>
+            <a href="/auth/logout" class="px-4 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition-colors duration-150">Logout</a>
         </div>
     </div>
-    
-    <div class="container">
+    <div class="max-w-5xl mx-auto mt-8 px-4">
         <% if (error) { %>
-            <div class="message error">
+            <div class="mb-4 px-4 py-2 rounded bg-red-100 text-red-800 border border-red-300 text-center">
                 <%= error %>
             </div>
         <% } %>
-        
-        <div class="card">
-            <h2>Create New Student</h2>
-            
-            <form action="/students/create" method="POST">
-                <div class="form-group">
-                    <label for="firstName">First Name *</label>
-                    <input 
-                        type="text" 
-                        id="firstName" 
-                        name="firstName" 
-                        value="<%= values.firstName || '' %>" 
-                        required
-                    >
+        <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8">
+            <h2 class="text-xl font-semibold mb-6 text-gray-800">Create New Student</h2>
+            <form action="/students/create" method="POST" class="space-y-4">
+                <div>
+                    <label for="firstName" class="block mb-1 font-medium text-gray-700">First Name *</label>
+                    <input type="text" id="firstName" name="firstName" value="<%= values.firstName || '' %>" required class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                 </div>
-                
-                <div class="form-group">
-                    <label for="lastName">Last Name *</label>
-                    <input 
-                        type="text" 
-                        id="lastName" 
-                        name="lastName" 
-                        value="<%= values.lastName || '' %>" 
-                        required
-                    >
+                <div>
+                    <label for="lastName" class="block mb-1 font-medium text-gray-700">Last Name *</label>
+                    <input type="text" id="lastName" name="lastName" value="<%= values.lastName || '' %>" required class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                 </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        value="<%= values.email || '' %>"
-                    >
+                <div>
+                    <label for="email" class="block mb-1 font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="email" name="email" value="<%= values.email || '' %>" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                 </div>
-                
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input 
-                        type="tel" 
-                        id="phone" 
-                        name="phone" 
-                        value="<%= values.phone || '' %>"
-                    >
+                <div>
+                    <label for="phone" class="block mb-1 font-medium text-gray-700">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="<%= values.phone || '' %>" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                 </div>
-                
-                <div class="form-group">
-                    <label for="dateOfBirth">Date of Birth</label>
-                    <input 
-                        type="date" 
-                        id="dateOfBirth" 
-                        name="dateOfBirth" 
-                        value="<%= values.dateOfBirth || '' %>"
-                    >
+                <div>
+                    <label for="dateOfBirth" class="block mb-1 font-medium text-gray-700">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth" value="<%= values.dateOfBirth || '' %>" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                 </div>
-                
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <textarea 
-                        id="address" 
-                        name="address"
-                    ><%= values.address || '' %></textarea>
+                <div>
+                    <label for="address" class="block mb-1 font-medium text-gray-700">Address</label>
+                    <textarea id="address" name="address" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full resize-vertical h-24"><%= values.address || '' %></textarea>
                 </div>
-                
-                <h3>Parent/Guardian Information</h3>
-                
-                <div class="row">
-                    <div class="col-50">
-                        <div class="form-group">
-                            <label for="parentName">Parent/Guardian Name</label>
-                            <input 
-                                type="text" 
-                                id="parentName" 
-                                name="parentName" 
-                                value="<%= values.parentName || '' %>"
-                            >
-                        </div>
+                <h3 class="text-lg font-semibold mt-8 mb-2 text-gray-800">Parent/Guardian Information</h3>
+                <div class="flex flex-wrap -mx-2 gap-y-4">
+                    <div class="w-full md:w-1/2 px-2">
+                        <label for="parentName" class="block mb-1 font-medium text-gray-700">Parent/Guardian Name</label>
+                        <input type="text" id="parentName" name="parentName" value="<%= values.parentName || '' %>" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                     </div>
-                    <div class="col-50">
-                        <div class="form-group">
-                            <label for="parentEmail">Parent/Guardian Email</label>
-                            <input 
-                                type="email" 
-                                id="parentEmail" 
-                                name="parentEmail" 
-                                value="<%= values.parentEmail || '' %>"
-                            >
-                        </div>
+                    <div class="w-full md:w-1/2 px-2">
+                        <label for="parentEmail" class="block mb-1 font-medium text-gray-700">Parent/Guardian Email</label>
+                        <input type="email" id="parentEmail" name="parentEmail" value="<%= values.parentEmail || '' %>" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                     </div>
                 </div>
-                
-                <div class="row">
-                    <div class="col-50">
-                        <div class="form-group">
-                            <label for="parentPhone">Parent/Guardian Phone</label>
-                            <input 
-                                type="tel" 
-                                id="parentPhone" 
-                                name="parentPhone" 
-                                value="<%= values.parentPhone || '' %>"
-                            >
-                        </div>
+                <div class="flex flex-wrap -mx-2 gap-y-4">
+                    <div class="w-full md:w-1/2 px-2">
+                        <label for="parentPhone" class="block mb-1 font-medium text-gray-700">Parent/Guardian Phone</label>
+                        <input type="tel" id="parentPhone" name="parentPhone" value="<%= values.parentPhone || '' %>" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                     </div>
-                    <div class="col-50">
-                        <div class="form-group">
-                            <label for="relationship">Relationship</label>
-                            <input 
-                                type="text" 
-                                id="relationship" 
-                                name="relationship" 
-                                value="<%= values.relationship || '' %>"
-                                placeholder="e.g., Father, Mother, Guardian"
-                            >
-                        </div>
+                    <div class="w-full md:w-1/2 px-2">
+                        <label for="relationship" class="block mb-1 font-medium text-gray-700">Relationship</label>
+                        <input type="text" id="relationship" name="relationship" value="<%= values.relationship || '' %>" placeholder="e.g., Father, Mother, Guardian" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="notes">Additional Notes</label>
-                    <textarea 
-                        id="notes" 
-                        name="notes"
-                    ><%= values.notes || '' %></textarea>
+                <div>
+                    <label for="notes" class="block mb-1 font-medium text-gray-700">Additional Notes</label>
+                    <textarea id="notes" name="notes" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full resize-vertical h-24"><%= values.notes || '' %></textarea>
                 </div>
-                
-                <button type="submit">Create Student</button>
+                <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold transition-colors duration-150">Create Student</button>
             </form>
         </div>
     </div>
