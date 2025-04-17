@@ -6,9 +6,17 @@
         <% if (user) { %>
             <a href="/" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Dashboard</a>
             <% if (user.role === 'admin') { %>
-                <a href="/admin/students" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Students</a>
-                <a href="/admin/classes" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Classes</a>
-                <a href="/admin/users" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Users</a>
+                <div>
+                    <button id="admin-menu-button" class="w-full flex items-center justify-between px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition focus:outline-none">
+                        <span>Admin</span>
+                        <svg id="admin-menu-arrow" class="w-4 h-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    <div id="admin-submenu" class="hidden pl-4 mt-1 space-y-1">
+                        <a href="/admin/students" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Students</a>
+                        <a href="/admin/classes" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Classes</a>
+                        <a href="/admin/users" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Users</a>
+                    </div>
+                </div>
             <% } %>
         <% } %>
     </nav>
@@ -53,6 +61,19 @@
                     });
                 });
             </script>
+            <% if (user.role === 'admin') { %>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const adminBtn = document.getElementById('admin-menu-button');
+                    const adminMenu = document.getElementById('admin-submenu');
+                    const adminArrow = document.getElementById('admin-menu-arrow');
+                    adminBtn.addEventListener('click', function() {
+                        adminMenu.classList.toggle('hidden');
+                        adminArrow.classList.toggle('rotate-180');
+                    });
+                });
+            </script>
+            <% } %>
         <% } else { %>
             <a href="/auth/login" class="w-full block px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-center rounded-lg shadow font-semibold transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">Login</a>
         <% } %>
