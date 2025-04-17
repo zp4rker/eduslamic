@@ -4,10 +4,10 @@ const { User, ROLES } = require('../models/User');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
 /**
- * Get profile edit page
- * GET /profile/edit
+ * Get profile page
+ * GET /profile
  */
-router.get('/edit', isAuthenticated, (req, res) => {
+router.get('/', isAuthenticated, (req, res) => {
   res.render('profile', {
     user: req.session.user,
     roles: ROLES,

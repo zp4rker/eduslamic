@@ -1,38 +1,79 @@
-<div class="max-w-5xl mx-auto mt-8 px-4">
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <%- include('partials/alerts', { success: success, error: error }) %>
-    <!-- Removed Your Profile section from dashboard. Profile info now only on profile page. -->
-    <!-- Role-specific content -->
-    <div class="mt-8 space-y-8">
+
+    <!-- Welcome Header -->
+    <div class="px-4 py-6 sm:px-0 mb-8">
+        <h1 class="text-3xl font-bold leading-tight text-gray-900">
+            Welcome, <%= user.name %>!
+        </h1>
+    </div>
+
+    <!-- Role-specific content cards -->
+    <div class="space-y-8">
         <% if (user.role === 'admin') { %>
-            <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 space-y-6">
-                <h2 class="text-xl font-semibold mb-6">Admin Actions</h2>
-                <p class="text-base mb-4">As an administrator, you have exclusive access to user management:</p>
-                <div class="flex flex-wrap gap-2">
-                    <a href="/students" class="inline-block px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow font-semibold transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">Manage Students</a>
-                    <a href="/classes" class="inline-block px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow font-semibold transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">Manage Classes</a>
-                    <!-- Add more admin actions here as you expand the CRM -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">Admin Dashboard</h2>
+                </div>
+                <div class="px-6 py-6">
+                    <p class="text-gray-600 mb-6">Manage system users, classes, and students.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="/admin/users" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            <!-- Optional Icon -->
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
+                            Manage Users
+                        </a>
+                        <a href="/admin/students" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                             <!-- Optional Icon -->
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                            Manage Students
+                        </a>
+                        <a href="/admin/classes" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out">
+                            <!-- Optional Icon -->
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.056 1.9l-2.1 1.4a1 1 0 00-.59 1.652l4.2 6.3a1 1 0 001.652.59l1.4-2.1a.999.999 0 011.9.056l1.4 2.1a1 1 0 001.652-.59l4.2-6.3a1 1 0 00-.59-1.652l-2.1-1.4a.999.999 0 01.056-1.9l2.6-1.131a1 1 0 000-1.84l-7-3zM12.943 9.051l-1.4 2.1a1 1 0 01-1.9-.056l-.6-1.8a1 1 0 00-1.898-.056l-1.4 2.1a1 1 0 01-1.9-.056l-2.6-3.9a1 1 0 01.59-1.652l2.1 1.4a1 1 0 001.9-.056l.6 1.8a1 1 0 011.898.056l1.4-2.1a1 1 0 00.59-1.652l2.1-1.4a1 1 0 011.9.056l2.6 3.9a1 1 0 01-.59 1.652l-2.1-1.4a1 1 0 00-1.9.056z"/></svg>
+                            Manage Classes
+                        </a>
+                    </div>
                 </div>
             </div>
         <% } %>
         <% if (user.role === 'teacher') { %>
-            <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 space-y-6">
-                <h2 class="text-xl font-semibold mb-6">Teacher Dashboard</h2>
-                <p class="text-base mb-4">Welcome to your teacher dashboard. Here you can manage your classes and students.</p>
-                <div class="flex flex-wrap gap-2">
-                    <!-- Add teacher specific actions here as you expand the CRM -->
-                    <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>View My Classes</button>
-                    <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>Student Records</button>
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">Teacher Dashboard</h2>
+                </div>
+                <div class="px-6 py-6">
+                    <p class="text-gray-600 mb-6">Access your classes, student records, and communication tools.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-gray-100 cursor-not-allowed" disabled>
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.056 1.9l-2.1 1.4a1 1 0 00-.59 1.652l4.2 6.3a1 1 0 001.652.59l1.4-2.1a.999.999 0 011.9.056l1.4 2.1a1 1 0 001.652-.59l4.2-6.3a1 1 0 00-.59-1.652l-2.1-1.4a.999.999 0 01.056-1.9l2.6-1.131a1 1 0 000-1.84l-7-3zM12.943 9.051l-1.4 2.1a1 1 0 01-1.9-.056l-.6-1.8a1 1 0 00-1.898-.056l-1.4 2.1a1 1 0 01-1.9-.056l-2.6-3.9a1 1 0 01.59-1.652l2.1 1.4a1 1 0 001.9-.056l.6 1.8a1 1 0 011.898.056l1.4-2.1a1 1 0 00.59-1.652l2.1-1.4a1 1 0 011.9.056l2.6 3.9a1 1 0 01-.59 1.652l-2.1-1.4a1 1 0 00-1.9.056z"/></svg>
+                            View My Classes (Coming Soon)
+                        </button>
+                        <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-gray-100 cursor-not-allowed" disabled>
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015.57 4.93a6.97 6.97 0 00-1.5 4.33A6.97 6.97 0 008.5 20a6.97 6.97 0 00-1.5-4.33A5 5 0 011 16v-1a5 5 0 015-5z"/></svg>
+                            Student Records (Coming Soon)
+                        </button>
+                    </div>
                 </div>
             </div>
         <% } %>
         <% if (user.role === 'parent') { %>
-            <div class="bg-white border border-gray-200 rounded-lg shadow-md p-8 space-y-6">
-                <h2 class="text-xl font-semibold mb-6">Parent Dashboard</h2>
-                <p class="text-base mb-4">Welcome to your parent dashboard. Here you can view your children's progress and communicate with teachers.</p>
-                <div class="flex flex-wrap gap-2">
-                    <!-- Add parent specific actions here as you expand the CRM -->
-                    <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>View My Children</button>
-                    <button class="inline-block px-4 py-2 rounded bg-blue-400 text-white opacity-60 cursor-not-allowed" disabled>Message Teachers</button>
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">Parent Dashboard</h2>
+                </div>
+                <div class="px-6 py-6">
+                    <p class="text-gray-600 mb-6">View your children's progress and communicate with teachers.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-gray-100 cursor-not-allowed" disabled>
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                            View My Children (Coming Soon)
+                        </button>
+                        <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-gray-100 cursor-not-allowed" disabled>
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.08-3.239A8.969 8.969 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>
+                            Message Teachers (Coming Soon)
+                        </button>
+                    </div>
                 </div>
             </div>
         <% } %>
