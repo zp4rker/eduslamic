@@ -22,12 +22,18 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
       }
     });
     
+    // Retrieve and clear success and error messages from session
+    const success = req.session.success;
+    const error = req.session.error;
+    req.session.success = null;
+    req.session.error = null;
+
     res.render('students/index', { 
       user: req.session.user, 
       students,
       parents, // Pass parents to the view
-      success: req.query.success,
-      error: req.query.error,
+      success,
+      error,
       values: {} // Add empty values for form repopulation (though redirect might clear it)
     });
   } catch (error) {
@@ -69,44 +75,31 @@ router.get('/create', isAuthenticated, isAdmin, async (req, res) => {
  */
 router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
   try {
-    // Destructure only the needed fields
     const { name, dateOfBirth, parentIds } = req.body;
-    
-    // Validate inputs
+
     if (!name || !dateOfBirth) {
-      // Fetch parents again for potential re-render (though redirect is used)
-      const parents = await User.findByRole(ROLES.PARENT);
-      // Redirect back with error and original values (as query params or flash messages if implemented)
-      // For simplicity, just redirecting with error message
-      return res.redirect('/students?error=' + encodeURIComponent('Name and date of birth are required'));
+      req.session.error = 'Name and date of birth are required';
+      return res.redirect('/students');
     }
-    
-    // Create student
+
     const student = await Student.create({
       name,
       dateOfBirth
-      // Removed other fields like email, phone, address, notes
     });
-    
-    // Link selected parents
+
     if (parentIds) {
-      // Handle both single and multiple parent selections
       const parentIdArray = Array.isArray(parentIds) ? parentIds : [parentIds];
-      
       for (const parentId of parentIdArray) {
-        // Ensure parent exists before linking (optional, depends on model logic)
-        // const parentExists = await User.findById(parentId);
-        // if (parentExists && parentExists.role === ROLES.PARENT) {
-           await Student.addParent(student._id, parentId);
-        // }
+        await Student.addParent(student._id, parentId);
       }
     }
-    
-    res.redirect('/students?success=Student created successfully');
+
+    req.session.success = 'Student created successfully';
+    res.redirect('/students');
   } catch (error) {
     console.error('Error creating student:', error);
-    // Redirect back to the index page with error
-    res.redirect('/students?error=' + encodeURIComponent(error.message || 'Failed to create student'));
+    req.session.error = error.message || 'Failed to create student';
+    res.redirect('/students');
   }
 });
 
@@ -172,7 +165,8 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
       }
     }
     
-    res.redirect('/students?success=Student updated successfully');
+    req.session.success = 'Student updated successfully';
+    res.redirect('/students');
   } catch (error) {
     console.error('Error updating student:', error);
     res.redirect(`/students/edit/${req.params.id}?error=${encodeURIComponent(error.message)}`);
@@ -187,11 +181,13 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const studentId = req.params.id;
     await Student.delete(studentId);
-    
-    res.redirect('/students?success=Student deleted successfully');
+
+    req.session.success = 'Student deleted successfully';
+    res.redirect('/students');
   } catch (error) {
     console.error('Error deleting student:', error);
-    res.redirect('/students?error=' + encodeURIComponent(error.message));
+    req.session.error = error.message || 'Failed to delete student';
+    res.redirect('/students');
   }
 });
 

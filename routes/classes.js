@@ -89,7 +89,8 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
       teacherId: teacherId || null
     });
     
-    res.redirect('/classes?success=Class created successfully');
+    req.session.success = 'Class created successfully';
+    res.redirect('/classes');
   } catch (error) {
     console.error('Error creating class:', error);
     res.redirect('/classes/create?error=' + encodeURIComponent(error.message));
@@ -145,7 +146,8 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
       teacherId: teacherId || null 
     });
     
-    res.redirect('/classes?success=Class updated successfully');
+    req.session.success = 'Class updated successfully';
+    res.redirect('/classes');
   } catch (error) {
     console.error('Error updating class:', error);
     res.redirect(`/classes/edit/${req.params.id}?error=${encodeURIComponent(error.message)}`);
@@ -160,11 +162,13 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const classId = req.params.id;
     await Class.delete(classId);
-    
-    res.redirect('/classes?success=Class deleted successfully');
+
+    req.session.success = 'Class deleted successfully';
+    res.redirect('/classes');
   } catch (error) {
     console.error('Error deleting class:', error);
-    res.redirect('/classes?error=' + encodeURIComponent(error.message));
+    req.session.error = error.message || 'Failed to delete class';
+    res.redirect('/classes');
   }
 });
 
@@ -267,7 +271,8 @@ router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
       }
     }
     
-    res.redirect(`/classes/view/${classId}?success=Students updated successfully`);
+    req.session.success = 'Students updated successfully';
+    res.redirect(`/classes/view/${classId}`);
   } catch (error) {
     console.error('Error updating students in class:', error);
     res.redirect(`/classes/${req.params.id}/students?error=${encodeURIComponent(error.message)}`);

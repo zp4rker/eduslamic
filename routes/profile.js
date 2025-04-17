@@ -31,7 +31,8 @@ router.post('/update', isAuthenticated, async (req, res) => {
     // Update session with new user data
     req.session.user = updatedUser;
     
-    res.redirect('/profile/edit?success=Profile updated successfully');
+    req.session.success = 'Profile updated successfully';
+    res.redirect('/profile/edit');
   } catch (error) {
     console.error('Profile update error:', error);
     res.redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
@@ -60,7 +61,8 @@ router.post('/password', isAuthenticated, async (req, res) => {
     // Update password
     await User.updatePassword(userId, currentPassword, newPassword);
     
-    res.redirect('/profile/edit?success=Password updated successfully');
+    req.session.success = 'Password updated successfully';
+    res.redirect('/profile/edit');
   } catch (error) {
     console.error('Password update error:', error);
     res.redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
@@ -89,7 +91,8 @@ router.post('/role/:userId', isAuthenticated, isAdmin, async (req, res) => {
       req.session.user = updatedUser;
     }
     
-    res.redirect('/?success=User role updated successfully');
+    req.session.success = 'User role updated successfully';
+    res.redirect('/');
   } catch (error) {
     console.error('Role update error:', error);
     res.redirect(`/?error=${encodeURIComponent(error.message)}`);
