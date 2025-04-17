@@ -7,7 +7,8 @@ PouchDB.plugin(require('pouchdb-find'));
 const expressLayouts = require('express-ejs-layouts');
 
 // Insert sample data for development/testing
-const setupDefaultUser = require('./initSampleData');
+const initSampleData = require('./initSampleData');
+const { initializeIndexes } = require('./models/User');
 
 // Initialize express app
 const app = express();
@@ -36,21 +37,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialize database
-const db = new PouchDB('users');
-
-// Create indexes for queries
-db.createIndex({
-  index: { fields: ['email'] }
-}).then(() => {
-  console.log('Email index created successfully');
-  
-  // Create default admin user after index is created
-  setupDefaultUser().then(() => {
+// Initialize database indexes and init sample data
+initializeIndexes().then(() => {
+  initSampleData().then(() => {
     console.log('Default users setup complete');
   });
-}).catch(err => {
-  console.error('Error creating index:', err);
 });
 
 // Routes

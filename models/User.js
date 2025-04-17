@@ -5,6 +5,15 @@ PouchDB.plugin(require('pouchdb-find'));
 
 const db = new PouchDB('users');
 
+async function initializeIndexes() {
+  try {
+    await db.createIndex({ index: { fields: ['email'] } });
+    console.log('Email index created successfully');
+  } catch (err) {
+    console.error('Error creating index:', err);
+  }
+}
+
 // Define valid roles
 const ROLES = {
   ADMIN: 'admin',
@@ -258,4 +267,4 @@ class User {
   }
 }
 
-module.exports = { User, ROLES };
+module.exports = { User, ROLES, db, initializeIndexes };
