@@ -66,10 +66,14 @@ async function initSampleData() {
       }
     ];
     for (const studentData of students) {
-      const existing = await Student.findById(studentData.email);
+      // Check if a student with the same name already exists
+      const allStudents = await Student.findAll();
+      const existing = allStudents.find(s => s.name === studentData.name);
       if (!existing) {
         console.log(`Creating example student: ${studentData.name}`);
         await Student.create(studentData);
+      } else {
+        console.log(`Example student with name ${studentData.name} already exists`);
       }
     }
 
