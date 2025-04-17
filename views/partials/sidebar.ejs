@@ -7,6 +7,9 @@
             <a href="/" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Dashboard</a>
             <a href="/students" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Students</a>
             <a href="/classes" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Classes</a>
+            <% if (user.role === 'admin') { %>
+                <a href="/users" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Users</a>
+            <% } %>
         <% } %>
     </nav>
     <div class="p-4 border-t flex flex-col items-start">

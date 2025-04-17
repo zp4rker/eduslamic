@@ -34,6 +34,7 @@ app.use(expressLayouts);
 // Middleware to make user available in all views
 app.use((req, res, next) => {
   res.locals.user = req.session.user || undefined;
+  res.locals.session = req.session;
   next();
 });
 
@@ -49,11 +50,13 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const studentRoutes = require('./routes/students');
 const classRoutes = require('./routes/classes');
+const userRoutes = require('./routes/users');
 
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
 app.use('/students', studentRoutes);
 app.use('/classes', classRoutes);
+app.use('/users', userRoutes);
 
 // Home route
 app.get('/', (req, res) => {

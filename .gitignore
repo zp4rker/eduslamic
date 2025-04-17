@@ -22,8 +22,6 @@ LOG.old
 MANIFEST*
 *.log
 *.json.gz
-users/
-users-*/
 
 # Debug logs
 logs/

@@ -265,6 +265,32 @@ class User {
   static getRoles() {
     return ROLES;
   }
+
+  /**
+   * Get all users
+   * @returns {Promise<Array<Object>>} - Array of user objects with passwords removed
+   */
+  static async findAll() {
+    try {
+      const result = await db.allDocs({
+        include_docs: true
+      });
+      
+      return result.rows
+        // Filter out system documents (IDs that start with _) and documents without required fields
+        .filter(row => row.doc && 
+                       row.doc._id && 
+                       !row.doc._id.startsWith('_') && 
+                       row.doc.name && 
+                       row.doc.email)
+        .map(row => {
+          const { password, ...userWithoutPassword } = row.doc;
+          return userWithoutPassword;
+        });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = { User, ROLES, db, initializeIndexes };
