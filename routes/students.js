@@ -28,7 +28,7 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     req.session.success = null;
     req.session.error = null;
 
-    res.render('students/index', { 
+    res.render('admin/students/index', { // Updated path
       user: req.session.user, 
       students,
       parents, // Pass parents to the view
@@ -38,7 +38,7 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching students:', error);
-    res.render('students/index', { 
+    res.render('admin/students/index', { // Updated path
       user: req.session.user, 
       students: [],
       parents: [], // Pass empty parents array on error
@@ -58,11 +58,11 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
     await Student.delete(studentId);
 
     req.session.success = 'Student deleted successfully';
-    res.redirect('/students');
+    res.redirect('/admin/students'); // Updated path
   } catch (error) {
     console.error('Error deleting student:', error);
     req.session.error = error.message || 'Failed to delete student';
-    res.redirect('/students');
+    res.redirect('/admin/students'); // Updated path
   }
 });
 
@@ -76,7 +76,7 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
     const student = await Student.getCompleteProfile(studentId);
     
     if (!student) {
-      return res.redirect('/students?error=Student not found');
+      return res.redirect('/admin/students?error=Student not found'); // Updated path
     }
     
     // Format date of birth
@@ -85,13 +85,13 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
       student.formattedDob = dob.toLocaleDateString();
     }
     
-    res.render('students/view', {
+    res.render('admin/students/view', { // Updated path
       user: req.session.user,
       student
     });
   } catch (error) {
     console.error('Error viewing student:', error);
-    res.redirect('/students?error=' + encodeURIComponent(error.message));
+    res.redirect('/admin/students?error=' + encodeURIComponent(error.message)); // Updated path
   }
 });
 

@@ -19,7 +19,7 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     req.session.success = null;
     req.session.error = null;
 
-    res.render('users/index', { 
+    res.render('admin/users/index', { // Updated path
       title: 'User Management',
       user: req.session.user, 
       users,
@@ -30,7 +30,7 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching users:', error);
-    res.render('users/index', { 
+    res.render('admin/users/index', { // Updated path
       title: 'User Management',
       user: req.session.user, 
       users: [],
@@ -53,26 +53,26 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     if (password !== confirmPassword) {
       req.session.error = 'Passwords do not match';
       req.session.values = { name, email, phone, role };
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
 
     // Validate password length
     if (password.length < 6) {
       req.session.error = 'Password must be at least 6 characters';
       req.session.values = { name, email, phone, role };
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
 
     // Create user
     await User.create({ name, email, phone, role, password });
 
     req.session.success = 'User created successfully';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   } catch (error) {
     console.error('Error creating user:', error);
     req.session.error = error.message || 'Failed to create user';
     req.session.values = req.body;
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   }
 });
 
@@ -89,11 +89,11 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
     await User.updateProfile(userId, { name, email, phone, role });
 
     req.session.success = 'User updated successfully';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   } catch (error) {
     console.error('Error updating user:', error);
     req.session.error = error.message || 'Failed to update user';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   }
 });
 
@@ -109,20 +109,20 @@ router.post('/reset-password/:id', isAuthenticated, isAdmin, async (req, res) =>
     // Validate passwords match
     if (newPassword !== confirmPassword) {
       req.session.error = 'Passwords do not match';
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
 
     // Validate password length
     if (newPassword.length < 6) {
       req.session.error = 'Password must be at least 6 characters';
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
 
     // Get the user
     const user = await User.findById(userId);
     if (!user) {
       req.session.error = 'User not found';
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
 
     // Hash the new password
@@ -135,11 +135,11 @@ router.post('/reset-password/:id', isAuthenticated, isAdmin, async (req, res) =>
     await User.db.put(user);
 
     req.session.success = 'Password reset successfully';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   } catch (error) {
     console.error('Error resetting password:', error);
     req.session.error = error.message || 'Failed to reset password';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   }
 });
 
@@ -154,25 +154,25 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
     // Prevent deleting yourself
     if (userId === req.session.user._id) {
       req.session.error = 'You cannot delete your own account';
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
     
     // Get user document
     const user = await User.findById(userId);
     if (!user) {
       req.session.error = 'User not found';
-      return res.redirect('/users');
+      return res.redirect('/admin/users'); // Updated path
     }
     
     // Delete the user
     await User.db.remove(user);
 
     req.session.success = 'User deleted successfully';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   } catch (error) {
     console.error('Error deleting user:', error);
     req.session.error = error.message || 'Failed to delete user';
-    res.redirect('/users');
+    res.redirect('/admin/users'); // Updated path
   }
 });
 

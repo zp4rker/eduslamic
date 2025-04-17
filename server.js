@@ -48,15 +48,11 @@ initializeIndexes().then(() => {
 // Routes
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
-const studentRoutes = require('./routes/students');
-const classRoutes = require('./routes/classes');
-const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
 
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
-app.use('/students', studentRoutes);
-app.use('/classes', classRoutes);
-app.use('/users', userRoutes);
+app.use('/admin', adminRoutes);
 
 // Home route
 app.get('/', (req, res) => {

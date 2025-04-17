@@ -35,7 +35,7 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     req.session.success = null;
     req.session.error = null;
     
-    res.render('classes/index', { 
+    res.render('admin/classes/index', { 
       user: req.session.user, 
       classes,
       teachers,
@@ -45,7 +45,7 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching classes:', error);
-    res.render('classes/index', { 
+    res.render('admin/classes/index', { 
       user: req.session.user, 
       classes: [],
       teachers: [],
@@ -65,11 +65,11 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
     await Class.delete(classId);
 
     req.session.success = 'Class deleted successfully';
-    res.redirect('/classes');
+    res.redirect('/admin/classes');
   } catch (error) {
     console.error('Error deleting class:', error);
     req.session.error = error.message || 'Failed to delete class';
-    res.redirect('/classes');
+    res.redirect('/admin/classes');
   }
 });
 
@@ -83,7 +83,7 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
     const classObj = await Class.findById(classId);
     
     if (!classObj) {
-      return res.redirect('/classes?error=Class not found');
+      return res.redirect('/admin/classes?error=Class not found');
     }
     
     // Get teacher info if assigned
@@ -97,7 +97,7 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
     // Get students in this class
     const students = await Student.findByClassId(classId);
     
-    res.render('classes/view', {
+    res.render('admin/classes/view', {
       user: req.session.user,
       classObj,
       students,
@@ -106,7 +106,7 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('Error viewing class:', error);
-    res.redirect('/classes?error=' + encodeURIComponent(error.message));
+    res.redirect('/admin/classes?error=' + encodeURIComponent(error.message));
   }
 });
 
@@ -120,7 +120,7 @@ router.get('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
     const classObj = await Class.findById(classId);
     
     if (!classObj) {
-      return res.redirect('/classes?error=Class not found');
+      return res.redirect('/admin/classes?error=Class not found');
     }
     
     // Get all students
@@ -129,7 +129,7 @@ router.get('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
     // Get students in this class
     const enrolledStudentIds = await StudentClass.findStudentsByClass(classId);
     
-    res.render('classes/manage-students', {
+    res.render('admin/classes/manage-students', {
       user: req.session.user,
       classObj,
       allStudents,
@@ -139,7 +139,7 @@ router.get('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading manage students form:', error);
-    res.redirect('/classes?error=' + encodeURIComponent(error.message));
+    res.redirect('/admin/classes?error=' + encodeURIComponent(error.message));
   }
 });
 
@@ -173,10 +173,10 @@ router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
     }
     
     req.session.success = 'Students updated successfully';
-    res.redirect(`/classes/view/${classId}`);
+    res.redirect(`/admin/classes/view/${classId}`);
   } catch (error) {
     console.error('Error updating students in class:', error);
-    res.redirect(`/classes/${req.params.id}/students?error=${encodeURIComponent(error.message)}`);
+    res.redirect(`/admin/classes/${req.params.id}/students?error=${encodeURIComponent(error.message)}`);
   }
 });
 

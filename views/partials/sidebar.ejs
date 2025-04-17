@@ -5,10 +5,10 @@
     <nav class="flex-1 flex flex-col gap-1 p-4">
         <% if (user) { %>
             <a href="/" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Dashboard</a>
-            <a href="/students" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Students</a>
-            <a href="/classes" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Classes</a>
             <% if (user.role === 'admin') { %>
-                <a href="/users" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Users</a>
+                <a href="/admin/students" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Students</a>
+                <a href="/admin/classes" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Classes</a>
+                <a href="/admin/users" class="block px-4 py-2 rounded text-gray-700 hover:bg-green-100 hover:text-green-700 transition">Users</a>
             <% } %>
         <% } %>
     </nav>
