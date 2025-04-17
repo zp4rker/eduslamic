@@ -24,9 +24,14 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
       }
     }
     
+    // Get all teachers for the class creation modal
+    const teachers = await User.findByRole(ROLES.TEACHER);
+    
     res.render('classes/index', { 
       user: req.session.user, 
       classes,
+      teachers,
+      values: {},
       success: req.query.success,
       error: req.query.error
     });
@@ -35,6 +40,8 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     res.render('classes/index', { 
       user: req.session.user, 
       classes: [],
+      teachers: [],
+      values: {},
       error: 'Failed to load classes'
     });
   }
