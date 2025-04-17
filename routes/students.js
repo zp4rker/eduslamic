@@ -12,6 +12,7 @@ const { isAuthenticated, isAdmin } = require('../middleware/auth');
 router.get('/', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const students = await Student.findAll();
+    const parents = await User.findByRole(ROLES.PARENT); // Fetch parents
     
     // Format dates for display
     students.forEach(student => {
@@ -24,15 +25,19 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     res.render('students/index', { 
       user: req.session.user, 
       students,
+      parents, // Pass parents to the view
       success: req.query.success,
-      error: req.query.error
+      error: req.query.error,
+      values: {} // Add empty values for form repopulation (though redirect might clear it)
     });
   } catch (error) {
     console.error('Error fetching students:', error);
     res.render('students/index', { 
       user: req.session.user, 
       students: [],
-      error: 'Failed to load students'
+      parents: [], // Pass empty parents array on error
+      error: 'Failed to load students',
+      values: {}
     });
   }
 });
@@ -64,25 +69,23 @@ router.get('/create', isAuthenticated, isAdmin, async (req, res) => {
  */
 router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
   try {
+    // Destructure only the needed fields
     const { name, dateOfBirth, parentIds } = req.body;
     
     // Validate inputs
     if (!name || !dateOfBirth) {
-      // Get all parents again for form re-render
+      // Fetch parents again for potential re-render (though redirect is used)
       const parents = await User.findByRole(ROLES.PARENT);
-      
-      return res.render('students/create', {
-        user: req.session.user,
-        parents,
-        values: req.body,
-        error: 'Name and date of birth are required'
-      });
+      // Redirect back with error and original values (as query params or flash messages if implemented)
+      // For simplicity, just redirecting with error message
+      return res.redirect('/students?error=' + encodeURIComponent('Name and date of birth are required'));
     }
     
     // Create student
     const student = await Student.create({
       name,
       dateOfBirth
+      // Removed other fields like email, phone, address, notes
     });
     
     // Link selected parents
@@ -91,14 +94,19 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
       const parentIdArray = Array.isArray(parentIds) ? parentIds : [parentIds];
       
       for (const parentId of parentIdArray) {
-        await Student.addParent(student._id, parentId);
+        // Ensure parent exists before linking (optional, depends on model logic)
+        // const parentExists = await User.findById(parentId);
+        // if (parentExists && parentExists.role === ROLES.PARENT) {
+           await Student.addParent(student._id, parentId);
+        // }
       }
     }
     
     res.redirect('/students?success=Student created successfully');
   } catch (error) {
     console.error('Error creating student:', error);
-    res.redirect('/students/create?error=' + encodeURIComponent(error.message));
+    // Redirect back to the index page with error
+    res.redirect('/students?error=' + encodeURIComponent(error.message || 'Failed to create student'));
   }
 });
 
