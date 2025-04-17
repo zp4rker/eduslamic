@@ -27,13 +27,21 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
     // Get all teachers for the class creation modal
     const teachers = await User.findByRole(ROLES.TEACHER);
     
+    // Get success/error messages from session
+    const success = req.session.success || req.query.success;
+    const error = req.session.error || req.query.error;
+    
+    // Clear session messages after retrieving them
+    req.session.success = null;
+    req.session.error = null;
+    
     res.render('classes/index', { 
       user: req.session.user, 
       classes,
       teachers,
       values: {},
-      success: req.query.success,
-      error: req.query.error
+      success,
+      error
     });
   } catch (error) {
     console.error('Error fetching classes:', error);
@@ -81,6 +89,11 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
       // Get all teachers again for form re-render
       const teachers = await User.findByRole(ROLES.TEACHER);
       
+      // If coming from modal form (index page)
+      if (req.headers.referer && req.headers.referer.endsWith('/classes')) {
+        return res.redirect('/classes?error=' + encodeURIComponent('Class name is required'));
+      }
+      
       return res.render('classes/create', {
         user: req.session.user,
         teachers,
@@ -100,6 +113,12 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     res.redirect('/classes');
   } catch (error) {
     console.error('Error creating class:', error);
+    
+    // If coming from modal form (index page)
+    if (req.headers.referer && req.headers.referer.endsWith('/classes')) {
+      return res.redirect('/classes?error=' + encodeURIComponent(error.message));
+    }
+    
     res.redirect('/classes/create?error=' + encodeURIComponent(error.message));
   }
 });
