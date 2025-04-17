@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="/styles/tailwind.css">
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <%- include('../partials/navbar', typeof navbar !== 'undefined' ? navbar : {}) %>
-    <main>
-        <%- body %>
-    </main>
+    <div id="page-wrapper" class="transition-all duration-300">
+        <%- include('../partials/navbar', typeof navbar !== 'undefined' ? navbar : {}) %>
+        <main>
+            <%- body %>
+        </main>
+    </div>
 </body>
 </html>
