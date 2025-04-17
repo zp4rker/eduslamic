@@ -63,7 +63,7 @@ router.get('/login', (req, res) => {
   if (req.session.user) {
     return res.redirect('/');
   }
-  res.render('login', { values: {} });
+  res.render('login', { values: {}, layout: 'layouts/minimal' });
 });
 
 module.exports = router;
