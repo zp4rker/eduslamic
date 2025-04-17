@@ -31,10 +31,11 @@ app.use(session({
 }));
 app.use(expressLayouts);
 
-// Middleware to make user available in all views
+// Middleware to make user and current path available in all views
 app.use((req, res, next) => {
   res.locals.user = req.session.user || undefined;
   res.locals.session = req.session;
+  res.locals.currentPath = req.path; // Add current path to locals
   next();
 });
 
@@ -58,12 +59,13 @@ app.use('/admin', adminRoutes);
 app.get('/', (req, res) => {
   if (req.session.user) {
     res.render('dashboard', { 
-      user: req.session.user,
+      // user and session are already in locals via middleware
+      // currentPath is also in locals
       success: req.query.success,
       error: req.query.error
     });
   } else {
-    res.render('login', { layout: 'layouts/minimal' });
+    res.render('login', { layout: 'layouts/minimal' }); // Minimal layout doesn't use sidebar
   }
 });
 
