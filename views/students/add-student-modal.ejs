@@ -1,0 +1,57 @@
+<!-- Modal for adding student -->
+<div id="add-student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-8 relative max-h-[90vh] overflow-y-auto">
+        <button id="close-add-student-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h3 class="text-xl font-semibold mb-6 text-gray-800">Create New Student</h3>
+        <!-- Simplified form -->
+        <form action="/students/create" method="POST" class="space-y-4">
+            <div>
+                <label for="name" class="block mb-1 font-medium text-gray-700">Full Name *</label>
+                <input type="text" id="name" name="name" value="<%= typeof values !== 'undefined' ? values.name || '' : '' %>" required class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
+            </div>
+            
+            <div>
+                <label for="dateOfBirth" class="block mb-1 font-medium text-gray-700">Date of Birth *</label>
+                <input type="date" id="dateOfBirth" name="dateOfBirth" value="<%= typeof values !== 'undefined' ? values.dateOfBirth || '' : '' %>" required class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full">
+            </div>
+
+            <div>
+                <label for="parentIds" class="block mb-1 font-medium text-gray-700">Assign Parent(s)</label>
+                <select multiple id="parentIds" name="parentIds" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 w-full h-32">
+                    <% if (typeof parents !== 'undefined' && parents.length > 0) { %>
+                        <% parents.forEach(parent => { %>
+                            <option value="<%= parent._id %>"><%= parent.name %> (<%= parent.email %>)</option>
+                        <% }); %>
+                    <% } else { %>
+                        <option disabled>No parents available</option>
+                    <% } %>
+                </select>
+                <p class="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple parents.</p>
+            </div>
+
+            <button type="submit" class="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow font-semibold transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transform hover:scale-105 hover:shadow-xl">
+                Create Student
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('add-student-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('add-student-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-add-student-modal').addEventListener('click', function() {
+        document.getElementById('add-student-modal').classList.add('hidden');
+    });
+    // Optional: Close modal on background click
+    document.getElementById('add-student-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+</script>
