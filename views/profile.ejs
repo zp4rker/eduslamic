@@ -19,9 +19,6 @@
             <p><span class="font-medium text-gray-600">Name:</span> <span><%= user.name %></span></p>
             <p><span class="font-medium text-gray-600">Email:</span> <span><%= user.email %></span></p>
             <p><span class="font-medium text-gray-600">Phone:</span> <span><%= user.phone %></span></p>
-            <p><span class="font-medium text-gray-600">Role:</span> <span class="inline-block px-3 py-1 rounded-full text-sm font-medium <%= roleBadgeClass %>"><%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %></span></p>
-            <p><span class="font-medium text-gray-600">User ID:</span> <span><%= user._id %></span></p>
-            <p><span class="font-medium text-gray-600">Joined:</span> <span><%= new Date(user.createdAt).toLocaleDateString() %></span></p>
             <p>
                 <a href="#" id="edit-profile-link" class="text-green-700 hover:underline text-sm">Update your information</a>
             </p>
