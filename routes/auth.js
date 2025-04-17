@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User, ROLES } = require('../models/User');
-
-// Middleware to check if user is admin
-const isAdmin = (req, res, next) => {
-  if (req.session.user && req.session.user.role === ROLES.ADMIN) {
-    return next();
-  }
-  res.redirect('/');
-};
+const { isAdmin } = require('../middleware/auth');
 
 /**
  * Login route
