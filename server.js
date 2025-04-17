@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const PouchDB = require('pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
+const expressLayouts = require('express-ejs-layouts');
 
 // Insert sample data for development/testing
 const setupDefaultUser = require('./initSampleData');
@@ -15,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 // Set up view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('layout', path.join(__dirname, 'views/layouts/base'));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,6 +28,13 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 3600000 } // 1 hour
 }));
+app.use(expressLayouts);
+
+// Middleware to make user available in all views
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || undefined;
+  next();
+});
 
 // Initialize database
 const db = new PouchDB('users');
@@ -61,10 +70,11 @@ app.get('/', (req, res) => {
     res.render('dashboard', { 
       user: req.session.user,
       success: req.query.success,
-      error: req.query.error
+      error: req.query.error,
+      layout: 'layouts/base'
     });
   } else {
-    res.render('login');
+    res.render('login', { layout: 'layouts/minimal' });
   }
 });
 
