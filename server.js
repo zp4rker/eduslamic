@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 // Set up view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', path.join(__dirname, 'views/layouts/base'));
+app.set('layout', 'layouts/base');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -70,8 +70,7 @@ app.get('/', (req, res) => {
     res.render('dashboard', { 
       user: req.session.user,
       success: req.query.success,
-      error: req.query.error,
-      layout: 'layouts/base'
+      error: req.query.error
     });
   } else {
     res.render('login', { layout: 'layouts/minimal' });
