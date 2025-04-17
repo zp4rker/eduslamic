@@ -15,7 +15,8 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.render('login', { 
         error: 'Email and password are required',
-        values: { email }
+        values: { email },
+        layout: 'layouts/minimal' // Use minimal layout
       });
     }
     
@@ -25,7 +26,8 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.render('login', { 
         error: 'Invalid email or password',
-        values: { email }
+        values: { email },
+        layout: 'layouts/minimal' // Use minimal layout
       });
     }
     
@@ -37,7 +39,8 @@ router.post('/login', async (req, res) => {
     console.error('Login error:', error);
     res.render('login', { 
       error: 'An error occurred during login',
-      values: { email: req.body.email }
+      values: { email: req.body.email },
+      layout: 'layouts/minimal' // Use minimal layout
     });
   }
 });
