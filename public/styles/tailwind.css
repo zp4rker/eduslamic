@@ -538,10 +538,6 @@ video {
 .z-50 {
   z-index: 50;
 }
-.-mx-2 {
-  margin-left: -0.5rem;
-  margin-right: -0.5rem;
-}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -690,9 +686,6 @@ video {
 .gap-4 {
   gap: 1rem;
 }
-.gap-y-4 {
-  row-gap: 1rem;
-}
 .space-y-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
@@ -822,10 +815,6 @@ video {
 }
 .p-8 {
   padding: 2rem;
-}
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 .px-3 {
   padding-left: 0.75rem;
