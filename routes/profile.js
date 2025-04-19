@@ -8,11 +8,15 @@ const { isAuthenticated, isAdmin } = require('../middleware/auth');
  * GET /profile
  */
 router.get('/', isAuthenticated, (req, res) => {
+  // Retrieve success message from session and clear it
+  const successMessage = req.session.success;
+  delete req.session.success;
+
   res.render('profile', {
     user: req.session.user,
     roles: ROLES,
-    success: req.query.success,
-    error: req.query.error
+    success: successMessage, // Pass session success message
+    error: req.query.error // Keep error handling via query params
   });
 });
 
