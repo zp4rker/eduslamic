@@ -1,13 +1,15 @@
 <!-- views/admin/classes/view-class-modal.ejs -->
-<div id="view-class-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-        <div class="flex justify-between items-center border-b pb-3 mb-5">
-            <h3 class="text-xl font-semibold text-gray-900" id="view-class-modal-title">Class Details</h3>
-            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="closeViewModal()">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+<div id="view-class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800" id="view-class-modal-title">Class Details</h3>
+            <button id="close-view-class-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             </button>
         </div>
-        <div id="view-class-modal-content">
+        <div id="view-class-modal-content" class="px-6 py-6">
             <!-- Loading state -->
             <div id="view-class-loading" class="text-center py-4">Loading...</div>
             <!-- Error state -->
@@ -35,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div class="flex justify-end pt-4 border-t mt-5">
+        <div class="px-6 pb-4 pt-4 bg-gray-50 border-t border-gray-200 flex justify-end">
             <button type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300" onclick="closeViewModal()">Close</button>
         </div>
     </div>
@@ -43,8 +45,8 @@
 
 <script>
     const viewModal = document.getElementById('view-class-modal');
+    const viewModalContentDiv = viewModal.querySelector('.bg-white'); // Target the inner div for animation
     const viewModalTitle = document.getElementById('view-class-modal-title');
-    const viewModalContent = document.getElementById('view-class-modal-content');
     const viewLoading = document.getElementById('view-class-loading');
     const viewError = document.getElementById('view-class-error');
     const viewDetails = document.getElementById('view-class-details');
@@ -55,21 +57,35 @@
     const viewNoStudents = document.getElementById('view-class-no-students');
 
     function closeViewModal() {
-        viewModal.classList.add('hidden');
-        // Reset state
+        viewModal.classList.add('opacity-0');
+        viewModalContentDiv.classList.add('opacity-0', 'scale-95');
+        viewModalContentDiv.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            viewModal.classList.add('pointer-events-none');
+            // Reset state after animation
+            viewLoading.style.display = 'block';
+            viewError.classList.add('hidden');
+            viewError.textContent = '';
+            viewDetails.classList.add('hidden');
+            viewStudentsList.innerHTML = ''; // Clear student list
+            viewNoStudents.classList.add('hidden');
+        }, 300); // Match duration-300
+    }
+
+    async function openViewModal(classId) {
+        // Reset state before showing
         viewLoading.style.display = 'block';
         viewError.classList.add('hidden');
         viewError.textContent = '';
         viewDetails.classList.add('hidden');
-        viewStudentsList.innerHTML = ''; // Clear student list
+        viewStudentsList.innerHTML = '';
         viewNoStudents.classList.add('hidden');
-    }
 
-    async function openViewModal(classId) {
-        viewModal.classList.remove('hidden');
-        viewLoading.style.display = 'block';
-        viewError.classList.add('hidden');
-        viewDetails.classList.add('hidden');
+        // Show modal with animation
+        viewModal.classList.remove('pointer-events-none');
+        viewModal.classList.remove('opacity-0');
+        viewModalContentDiv.classList.remove('opacity-0', 'scale-95');
+        viewModalContentDiv.classList.add('opacity-100', 'scale-100');
 
         try {
             const response = await fetch(`/admin/classes/api/details/${classId}`);
@@ -109,8 +125,12 @@
         }
     }
 
+    // Add ID to the close button if it doesn't have one, or use the existing one
+    document.getElementById('close-view-class-modal').addEventListener('click', closeViewModal);
+
     // Close modal if clicking outside of it
     viewModal.addEventListener('click', (event) => {
+        // Check if the click is on the backdrop itself, not the content
         if (event.target === viewModal) {
             closeViewModal();
         }
