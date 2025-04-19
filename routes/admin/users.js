@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { User, ROLES } = require('../models/User');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { User, ROLES } = require('../../models/User'); // Corrected path
+const { isAuthenticated, isAdmin } = require('../../middleware/auth'); // Corrected path
 const bcrypt = require('bcryptjs');
 
 /**

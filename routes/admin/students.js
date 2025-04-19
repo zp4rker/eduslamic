@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Student = require('../models/Student');
-const { User, ROLES } = require('../models/User');
-const StudentParent = require('../models/StudentParent');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const Student = require('../../models/Student'); // Corrected path
+const { User, ROLES } = require('../../models/User'); // Corrected path
+const StudentParent = require('../../models/StudentParent'); // Corrected path
+const { isAuthenticated, isAdmin } = require('../../middleware/auth'); // Corrected path
 
 /**
  * Get all students - Admin only
@@ -79,6 +79,54 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error creating student:', error);
     req.session.error = error.message || 'Failed to create student';
+    req.session.values = req.body; // Pass back submitted values on error
+    res.redirect('/admin/students');
+  }
+});
+
+/**
+ * Update student - Admin only
+ * POST /students/edit/:id
+ */
+router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const { name, dateOfBirth, parentIds } = req.body;
+
+    // Basic validation
+    if (!name || !dateOfBirth) {
+      req.session.error = 'Student name and date of birth are required.';
+      req.session.values = req.body; // Pass back submitted values
+      // Redirect back to the student list, the modal might need to be reopened manually or state managed client-side
+      return res.redirect('/admin/students'); 
+    }
+
+    // Update the student's core details using the correct method name
+    await Student.update(studentId, { name, dateOfBirth }); // Changed from updateProfile to update
+
+    // Update parent associations
+    const currentParentIds = await StudentParent.findParentsByStudent(studentId);
+    const newParentIds = parentIds ? (Array.isArray(parentIds) ? parentIds : [parentIds]) : [];
+
+    // Remove parents that were unselected
+    for (const currentId of currentParentIds) {
+      if (!newParentIds.includes(currentId)) {
+        await Student.removeParent(studentId, currentId);
+      }
+    }
+
+    // Add newly selected parents
+    for (const newId of newParentIds) {
+      if (!currentParentIds.includes(newId)) {
+        await Student.addParent(studentId, newId);
+      }
+    }
+
+    req.session.success = 'Student updated successfully';
+    res.redirect('/admin/students');
+  } catch (error) {
+    console.error('Error updating student:', error);
+    req.session.error = error.message || 'Failed to update student';
     req.session.values = req.body; // Pass back submitted values on error
     res.redirect('/admin/students');
   }

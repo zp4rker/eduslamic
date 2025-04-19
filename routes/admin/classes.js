@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Class = require('../models/Class');
-const Student = require('../models/Student');
-const { User, ROLES } = require('../models/User');
-const StudentClass = require('../models/StudentClass');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const Class = require('../../models/Class'); // Corrected path
+const Student = require('../../models/Student'); // Corrected path
+const { User, ROLES } = require('../../models/User'); // Corrected path
+const StudentClass = require('../../models/StudentClass'); // Corrected path
+const { isAuthenticated, isAdmin } = require('../../middleware/auth'); // Corrected path
 
 /**
  * Get all classes - Admin only
