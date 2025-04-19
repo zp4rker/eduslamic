@@ -1,6 +1,6 @@
 <!-- Modal for editing student -->
-<div id="edit-student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+<div id="edit-student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Edit Student: <span id="edit-student-title"></span></h3>
             <button id="close-edit-student-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -15,7 +15,7 @@
                 <label for="edit-name" class="block text-sm font-medium text-gray-700">Full Name *</label>
                 <input type="text" id="edit-name" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-            
+
             <div>
                 <label for="edit-dateOfBirth" class="block text-sm font-medium text-gray-700">Date of Birth *</label>
                 <input type="date" id="edit-dateOfBirth" name="dateOfBirth" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -45,39 +45,54 @@
 </div>
 
 <script>
-    // Edit student functionality
-    const editButtons = document.querySelectorAll('.edit-student-button');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const studentId = this.getAttribute('data-id');
-            const studentName = this.getAttribute('data-name');
-            const dob = this.getAttribute('data-dob');
+    const editModal = document.getElementById('edit-student-modal');
+    const editModalContent = editModal.querySelector('.bg-white'); // Target the inner content div
+    const editStudentForm = document.getElementById('edit-student-form');
+    const editStudentTitle = document.getElementById('edit-student-title');
+    const editNameInput = document.getElementById('edit-name');
+    const editDobInput = document.getElementById('edit-dateOfBirth');
+    // Add reference to parent select if needed for pre-selection
+    // const editParentSelect = document.getElementById('edit-parentIds');
 
-            // Set form action URL
-            document.getElementById('edit-student-form').action = `/students/edit/${studentId}`;
-            
-            // Fill form fields
-            document.getElementById('edit-student-title').textContent = studentName;
-            document.getElementById('edit-name').value = studentName;
-            document.getElementById('edit-dateOfBirth').value = dob;
-            
-            // Show modal
-            document.getElementById('edit-student-modal').classList.remove('hidden');
-            
-            // Get the current parent ids for this student (if available)
-            // This requires an API call or server-side data since we don't have parent data attached to the button
-            // For now we'll leave the parents multi-select as is - you may want to add this functionality later
-        });
-    });
+    function showEditStudentModal(studentId, studentName, dob) {
+        // Set form action URL
+        editStudentForm.action = `/students/edit/${studentId}`;
 
-    document.getElementById('close-edit-student-modal').addEventListener('click', function() {
-        document.getElementById('edit-student-modal').classList.add('hidden');
-    });
+        // Fill form fields
+        editStudentTitle.textContent = studentName;
+        editNameInput.value = studentName;
+        editDobInput.value = dob;
+
+        // TODO: Add logic to fetch and pre-select assigned parents if necessary
+        // This would likely involve an async fetch call here.
+
+        // Show modal with animation
+        editModal.classList.remove('pointer-events-none');
+        editModal.classList.remove('opacity-0');
+        editModalContent.classList.remove('opacity-0', 'scale-95');
+        editModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    function hideEditStudentModal() {
+        editModal.classList.add('opacity-0');
+        editModalContent.classList.add('opacity-0', 'scale-95');
+        editModalContent.classList.remove('opacity-100', 'scale-100');
+        // Wait for animation to finish before disabling pointer events
+        setTimeout(() => {
+            editModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    // Event listener for close button
+    document.getElementById('close-edit-student-modal').addEventListener('click', hideEditStudentModal);
 
     // Close edit modal on background click
-    document.getElementById('edit-student-modal').addEventListener('click', function(e) {
+    editModal.addEventListener('click', function(e) {
         if (e.target === this) {
-            this.classList.add('hidden');
+            hideEditStudentModal();
         }
     });
+
+    // Note: The trigger for showEditStudentModal (the edit buttons) is in index.ejs.
+    // We will update index.ejs to call showEditStudentModal.
 </script>

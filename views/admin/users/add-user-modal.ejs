@@ -1,6 +1,6 @@
 <!-- Modal for adding user -->
-<div id="add-user-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+<div id="add-user-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Create New User</h3>
             <button id="close-add-user-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -56,19 +56,46 @@
 </div>
 
 <script>
-    document.getElementById('add-user-button').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('add-user-modal').classList.remove('hidden');
-    });
+    const addUserModal = document.getElementById('add-user-modal');
+    const addUserModalContent = addUserModal.querySelector('.bg-white');
 
-    document.getElementById('close-add-user-modal').addEventListener('click', function() {
-        document.getElementById('add-user-modal').classList.add('hidden');
-    });
+    // Function to show the modal with animation
+    window.showAddUserModal = function() {
+        addUserModal.classList.remove('pointer-events-none');
+        addUserModal.classList.remove('opacity-0');
+        addUserModalContent.classList.remove('opacity-0', 'scale-95');
+        addUserModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    // Function to hide the modal with animation
+    window.hideAddUserModal = function() {
+        addUserModal.classList.add('opacity-0');
+        addUserModalContent.classList.add('opacity-0', 'scale-95');
+        addUserModalContent.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            addUserModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    // Update button listeners to use the new functions
+    // The button with id 'add-user-button' is likely in index.ejs, 
+    // it should be updated there to call showAddUserModal()
+    // Example: <button id="add-user-button" onclick="showAddUserModal()">...</button>
+    // If you cannot modify index.ejs, keep the original listener but call the new function:
+    const addBtn = document.getElementById('add-user-button');
+    if (addBtn) { // Check if the button exists on this page (it might be in index.ejs)
+        addBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.showAddUserModal();
+        });
+    }
+
+    document.getElementById('close-add-user-modal').addEventListener('click', window.hideAddUserModal);
     
     // Close modal on background click
-    document.getElementById('add-user-modal').addEventListener('click', function(e) {
+    addUserModal.addEventListener('click', function(e) {
         if (e.target === this) {
-            this.classList.add('hidden');
+            window.hideAddUserModal();
         }
     });
 </script>

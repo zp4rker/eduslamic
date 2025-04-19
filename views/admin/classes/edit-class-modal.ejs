@@ -1,6 +1,6 @@
 <!-- Modal for editing class -->
-<div id="edit-class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+<div id="edit-class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Edit Class: <span id="edit-class-title"></span></h3>
             <button id="close-edit-class-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -42,7 +42,46 @@
 </div>
 
 <script>
-    // Edit class functionality
+    const editClassModal = document.getElementById('edit-class-modal');
+    const editClassModalContent = editClassModal.querySelector('.bg-white');
+    const editClassForm = document.getElementById('edit-class-form');
+    const editClassTitle = document.getElementById('edit-class-title');
+    const editNameInput = document.getElementById('edit-name');
+    const editDescriptionInput = document.getElementById('edit-description');
+    const editTeacherSelect = document.getElementById('edit-teacher');
+
+    function showEditClassModal(classId, className, description, teacherId) {
+        // Set form action URL
+        editClassForm.action = `/classes/edit/${classId}`;
+
+        // Fill form fields
+        editClassTitle.textContent = className;
+        editNameInput.value = className;
+        editDescriptionInput.value = description;
+
+        // Set teacher dropdown
+        for (let i = 0; i < editTeacherSelect.options.length; i++) {
+            editTeacherSelect.options[i].selected = (editTeacherSelect.options[i].value === teacherId);
+        }
+
+        // Show modal with animation
+        editClassModal.classList.remove('pointer-events-none');
+        editClassModal.classList.remove('opacity-0');
+        editClassModalContent.classList.remove('opacity-0', 'scale-95');
+        editClassModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    function hideEditClassModal() {
+        editClassModal.classList.add('opacity-0');
+        editClassModalContent.classList.add('opacity-0', 'scale-95');
+        editClassModalContent.classList.remove('opacity-100', 'scale-100');
+        // Wait for animation to finish before disabling pointer events
+        setTimeout(() => {
+            editClassModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    // Attach event listeners to edit buttons (assuming they are in index.ejs or similar)
     const editButtons = document.querySelectorAll('.edit-class-button');
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -51,36 +90,17 @@
             const description = this.getAttribute('data-description');
             const teacherId = this.getAttribute('data-teacher-id');
 
-            // Set form action URL
-            document.getElementById('edit-class-form').action = `/classes/edit/${classId}`;
-            
-            // Fill form fields
-            document.getElementById('edit-class-title').textContent = className;
-            document.getElementById('edit-name').value = className;
-            document.getElementById('edit-description').value = description;
-            
-            // Set teacher dropdown
-            const teacherSelect = document.getElementById('edit-teacher');
-            for (let i = 0; i < teacherSelect.options.length; i++) {
-                if (teacherSelect.options[i].value === teacherId) {
-                    teacherSelect.options[i].selected = true;
-                    break;
-                }
-            }
-            
-            // Show modal
-            document.getElementById('edit-class-modal').classList.remove('hidden');
+            showEditClassModal(classId, className, description, teacherId);
         });
     });
 
-    document.getElementById('close-edit-class-modal').addEventListener('click', function() {
-        document.getElementById('edit-class-modal').classList.add('hidden');
-    });
+    // Event listener for close button
+    document.getElementById('close-edit-class-modal').addEventListener('click', hideEditClassModal);
 
     // Close edit modal on background click
-    document.getElementById('edit-class-modal').addEventListener('click', function(e) {
+    editClassModal.addEventListener('click', function(e) {
         if (e.target === this) {
-            this.classList.add('hidden');
+            hideEditClassModal();
         }
     });
 </script>

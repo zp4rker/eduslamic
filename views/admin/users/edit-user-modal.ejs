@@ -1,6 +1,6 @@
 <!-- Modal for editing user -->
-<div id="edit-user-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+<div id="edit-user-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Edit User: <span id="edit-user-title"></span></h3>
             <button id="close-edit-user-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -45,46 +45,57 @@
 </div>
 
 <script>
-    const editButtons = document.querySelectorAll('.edit-user-button');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = this.getAttribute('data-id');
-            const userName = this.getAttribute('data-name');
-            const userEmail = this.getAttribute('data-email');
-            const userPhone = this.getAttribute('data-phone');
-            const userRole = this.getAttribute('data-role');
+    const editUserModal = document.getElementById('edit-user-modal');
+    const editUserModalContent = editUserModal.querySelector('.bg-white');
+    const editUserForm = document.getElementById('edit-user-form');
+    const editUserTitle = document.getElementById('edit-user-title');
+    const editNameInput = document.getElementById('edit-name');
+    const editEmailInput = document.getElementById('edit-email');
+    const editPhoneInput = document.getElementById('edit-phone');
+    const editRoleSelect = document.getElementById('edit-role');
 
-            // Set form action URL
-            document.getElementById('edit-user-form').action = `/users/edit/${userId}`;
-            
-            // Fill form fields
-            document.getElementById('edit-user-title').textContent = userName;
-            document.getElementById('edit-name').value = userName;
-            document.getElementById('edit-email').value = userEmail;
-            document.getElementById('edit-phone').value = userPhone;
-            
-            // Set role dropdown value
-            const roleSelect = document.getElementById('edit-role');
-            for (let i = 0; i < roleSelect.options.length; i++) {
-                if (roleSelect.options[i].value === userRole) {
-                    roleSelect.options[i].selected = true;
-                    break;
-                }
+    // Function to show the modal with animation and populate data
+    window.showEditUserModal = function(userId, userName, userEmail, userPhone, userRole) {
+        // Set form action URL
+        editUserForm.action = `/users/edit/${userId}`;
+        
+        // Fill form fields
+        editUserTitle.textContent = userName;
+        editNameInput.value = userName;
+        editEmailInput.value = userEmail;
+        editPhoneInput.value = userPhone || ''; // Handle potentially null phone
+        
+        // Set role dropdown value
+        for (let i = 0; i < editRoleSelect.options.length; i++) {
+            if (editRoleSelect.options[i].value === userRole) {
+                editRoleSelect.options[i].selected = true;
+                break;
             }
-            
-            // Show modal
-            document.getElementById('edit-user-modal').classList.remove('hidden');
-        });
-    });
+        }
 
-    document.getElementById('close-edit-user-modal').addEventListener('click', function() {
-        document.getElementById('edit-user-modal').classList.add('hidden');
-    });
+        // Show modal with animation
+        editUserModal.classList.remove('pointer-events-none');
+        editUserModal.classList.remove('opacity-0');
+        editUserModalContent.classList.remove('opacity-0', 'scale-95');
+        editUserModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    // Function to hide the modal with animation
+    window.hideEditUserModal = function() {
+        editUserModal.classList.add('opacity-0');
+        editUserModalContent.classList.add('opacity-0', 'scale-95');
+        editUserModalContent.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            editUserModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    document.getElementById('close-edit-user-modal').addEventListener('click', window.hideEditUserModal);
 
     // Close modal on background click
-    document.getElementById('edit-user-modal').addEventListener('click', function(e) {
+    editUserModal.addEventListener('click', function(e) {
         if (e.target === this) {
-            this.classList.add('hidden');
+            window.hideEditUserModal();
         }
     });
 </script>

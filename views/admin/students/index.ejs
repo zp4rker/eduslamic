@@ -89,12 +89,31 @@
 </div>
 
 <script>
-    // Ensure both add buttons trigger the modal
-    document.getElementById('add-student-button')?.addEventListener('click', () => {
-        document.getElementById('add-student-modal').classList.remove('hidden');
+    document.addEventListener('DOMContentLoaded', () => {
+        // Add Student Modal Trigger
+        document.getElementById('add-student-button')?.addEventListener('click', () => {
+            if (typeof window.showAddStudentModal === 'function') {
+                window.showAddStudentModal();
+            }
+        });
+        document.getElementById('add-student-button-empty')?.addEventListener('click', () => {
+            if (typeof window.showAddStudentModal === 'function') {
+                window.showAddStudentModal();
+            }
+        });
+
+        // Edit Student Modal Trigger
+        const editButtons = document.querySelectorAll('.edit-student-button');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const studentId = this.getAttribute('data-id');
+                const studentName = this.getAttribute('data-name');
+                const dob = this.getAttribute('data-dob');
+
+                if (typeof window.showEditStudentModal === 'function') {
+                    window.showEditStudentModal(studentId, studentName, dob);
+                }
+            });
+        });
     });
-    document.getElementById('add-student-button-empty')?.addEventListener('click', () => {
-        document.getElementById('add-student-modal').classList.remove('hidden');
-    });
-    // Add similar logic for edit buttons if needed, assuming modal logic exists elsewhere
 </script>

@@ -1,6 +1,6 @@
 <!-- Modal for adding class -->
-<div id="add-class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+<div id="add-class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Create New Class</h3>
             <button id="close-add-class-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -42,17 +42,41 @@
 </div>
 
 <script>
-    document.getElementById('add-class-button').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('add-class-modal').classList.remove('hidden');
-    });
-    document.getElementById('close-add-class-modal').addEventListener('click', function() {
-        document.getElementById('add-class-modal').classList.add('hidden');
-    });
+    const addClassModal = document.getElementById('add-class-modal');
+    const addClassModalContent = addClassModal.querySelector('.bg-white');
+
+    function showAddClassModal() {
+        addClassModal.classList.remove('pointer-events-none');
+        addClassModal.classList.remove('opacity-0');
+        addClassModalContent.classList.remove('opacity-0', 'scale-95');
+        addClassModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    function hideAddClassModal() {
+        addClassModal.classList.add('opacity-0');
+        addClassModalContent.classList.add('opacity-0', 'scale-95');
+        addClassModalContent.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            addClassModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    // Trigger to show the modal (assuming a button with id 'add-class-button' exists elsewhere, e.g., in index.ejs)
+    // Ensure the button exists and has the correct ID
+    const addClassButton = document.getElementById('add-class-button');
+    if (addClassButton) {
+        addClassButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showAddClassModal();
+        });
+    }
+
+    document.getElementById('close-add-class-modal').addEventListener('click', hideAddClassModal);
+
     // Close modal on background click
-    document.getElementById('add-class-modal').addEventListener('click', function(e) {
+    addClassModal.addEventListener('click', function(e) {
         if (e.target === this) {
-            this.classList.add('hidden');
+            hideAddClassModal();
         }
     });
 </script>

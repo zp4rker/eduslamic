@@ -1,6 +1,6 @@
 <!-- Modal for adding student -->
-<div id="add-student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+<div id="add-student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Create New Student</h3>
             <button id="close-add-student-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -9,7 +9,6 @@
                 </svg>
             </button>
         </div>
-        <!-- Simplified form -->
         <form action="/students/create" method="POST" class="px-6 py-6 space-y-4">
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Full Name *</label>
@@ -45,17 +44,37 @@
 </div>
 
 <script>
-    document.getElementById('add-student-button').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('add-student-modal').classList.remove('hidden');
-    });
-    document.getElementById('close-add-student-modal').addEventListener('click', function() {
-        document.getElementById('add-student-modal').classList.add('hidden');
-    });
+    const addModal = document.getElementById('add-student-modal');
+    const addModalContent = addModal.querySelector('.bg-white'); // Target the inner content div
+
+    // Attach to window object
+    window.showAddStudentModal = function() {
+        addModal.classList.remove('pointer-events-none');
+        addModal.classList.remove('opacity-0');
+        addModalContent.classList.remove('opacity-0', 'scale-95');
+        addModalContent.classList.add('opacity-100', 'scale-100'); // Add final states for content
+    }
+
+    // Attach to window object
+    window.hideAddStudentModal = function() {
+        addModal.classList.add('opacity-0');
+        addModalContent.classList.add('opacity-0', 'scale-95');
+        addModalContent.classList.remove('opacity-100', 'scale-100'); // Remove final states for content
+        // Wait for animation to finish before disabling pointer events
+        setTimeout(() => {
+            addModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    // Keep original event listeners, but call the new functions
+    document.getElementById('close-add-student-modal').addEventListener('click', window.hideAddStudentModal);
+
     // Optional: Close modal on background click
-    document.getElementById('add-student-modal').addEventListener('click', function(e) {
+    addModal.addEventListener('click', function(e) {
         if (e.target === this) {
-            this.classList.add('hidden');
+            window.hideAddStudentModal();
         }
     });
+
+    // No need to expose globally anymore as they are attached to window
 </script>
