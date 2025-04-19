@@ -131,4 +131,54 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
   }
 });
 
+/**
+ * API endpoint to get student details for modal view
+ * GET /admin/students/api/details/:id
+ */
+router.get('/api/details/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const studentProfile = await Student.getCompleteProfile(studentId);
+
+    if (!studentProfile) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    // Ensure date of birth is formatted
+    let formattedDob = 'N/A';
+    if (studentProfile.dateOfBirth) {
+        try {
+            const dob = new Date(studentProfile.dateOfBirth);
+            // Check if dob is a valid date before formatting
+            if (!isNaN(dob.getTime())) {
+                formattedDob = dob.toLocaleDateString();
+            } else {
+                console.warn(`Invalid dateOfBirth found for student ${studentId}: ${studentProfile.dateOfBirth}`);
+            }
+        } catch (dateError) {
+            console.error(`Error formatting dateOfBirth for student ${studentId}:`, dateError);
+        }
+    }
+
+    // Prepare data for the modal
+    const responseData = {
+      student: {
+        _id: studentProfile._id,
+        name: studentProfile.name,
+        formattedDob: formattedDob // Use the formatted date
+      },
+      // The modal expects a single parent object, let's take the first one if available
+      parent: studentProfile.parents && studentProfile.parents.length > 0 ? studentProfile.parents[0] : null,
+      classes: studentProfile.classes || []
+    };
+
+    res.json(responseData);
+
+  } catch (error) {
+    console.error('Error fetching student details for API:', error);
+    // Ensure a JSON error response is sent
+    res.status(500).json({ error: error.message || 'Failed to load student details' });
+  }
+});
+
 module.exports = router;

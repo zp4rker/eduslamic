@@ -1,0 +1,143 @@
+<!-- views/admin/students/view-student-modal.ejs -->
+<div id="view-student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800" id="view-student-modal-title">Student Details</h3>
+            <button id="close-view-student-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="view-student-modal-content" class="px-6 py-6">
+            <!-- Loading state -->
+            <div id="view-student-loading" class="text-center py-4">Loading...</div>
+            <!-- Error state -->
+            <div id="view-student-error" class="hidden text-red-600 py-4"></div>
+            <!-- Content -->
+            <div id="view-student-details" class="hidden">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Name:</label>
+                    <p class="mt-1 text-lg text-gray-900" id="view-student-name"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Date of Birth:</label>
+                    <p class="mt-1 text-gray-600" id="view-student-dob"></p>
+                </div>
+                 <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Parent/Guardian:</label>
+                    <p class="mt-1 text-gray-600" id="view-student-parent"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Enrolled Classes:</label>
+                    <ul id="view-student-classes-list" class="mt-1 list-disc list-inside text-gray-600">
+                        <!-- Class names will be populated here -->
+                    </ul>
+                    <p id="view-student-no-classes" class="mt-1 text-gray-500 italic hidden">Not enrolled in any classes.</p>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 pb-4 pt-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+            <button type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300" onclick="closeViewStudentModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const viewStudentModal = document.getElementById('view-student-modal');
+    const viewStudentModalContentDiv = viewStudentModal.querySelector('.bg-white'); // Target the inner div for animation
+    const viewStudentModalTitle = document.getElementById('view-student-modal-title');
+    const viewStudentLoading = document.getElementById('view-student-loading');
+    const viewStudentError = document.getElementById('view-student-error');
+    const viewStudentDetails = document.getElementById('view-student-details');
+    const viewStudentName = document.getElementById('view-student-name');
+    const viewStudentDob = document.getElementById('view-student-dob');
+    const viewStudentParent = document.getElementById('view-student-parent');
+    const viewStudentClassesList = document.getElementById('view-student-classes-list');
+    const viewStudentNoClasses = document.getElementById('view-student-no-classes');
+
+    function closeViewStudentModal() {
+        viewStudentModal.classList.add('opacity-0');
+        viewStudentModalContentDiv.classList.add('opacity-0', 'scale-95');
+        viewStudentModalContentDiv.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            viewStudentModal.classList.add('pointer-events-none');
+            // Reset state after animation
+            viewStudentLoading.style.display = 'block';
+            viewStudentError.classList.add('hidden');
+            viewStudentError.textContent = '';
+            viewStudentDetails.classList.add('hidden');
+            viewStudentClassesList.innerHTML = ''; // Clear class list
+            viewStudentNoClasses.classList.add('hidden');
+        }, 300); // Match duration-300
+    }
+
+    async function openViewStudentModal(studentId) {
+        // Reset state before showing
+        viewStudentLoading.style.display = 'block';
+        viewStudentError.classList.add('hidden');
+        viewStudentError.textContent = '';
+        viewStudentDetails.classList.add('hidden');
+        viewStudentClassesList.innerHTML = '';
+        viewStudentNoClasses.classList.add('hidden');
+
+        // Show modal with animation
+        viewStudentModal.classList.remove('pointer-events-none');
+        viewStudentModal.classList.remove('opacity-0');
+        viewStudentModalContentDiv.classList.remove('opacity-0', 'scale-95');
+        viewStudentModalContentDiv.classList.add('opacity-100', 'scale-100');
+
+        try {
+            // TODO: Update this fetch URL when the API endpoint exists
+            const response = await fetch(`/admin/students/api/details/${studentId}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const { student, parent, classes } = data; // Assuming API returns student, parent, and classes data
+
+            // Populate modal
+            viewStudentModalTitle.textContent = `Details for ${student.name}`;
+            viewStudentName.textContent = student.name;
+            viewStudentDob.textContent = student.formattedDob || 'N/A'; // Assuming formattedDob exists
+            viewStudentParent.textContent = parent ? parent.name : 'N/A'; // Assuming parent object with name
+
+            viewStudentClassesList.innerHTML = ''; // Clear previous list
+            if (classes && classes.length > 0) {
+                classes.forEach(cls => {
+                    const li = document.createElement('li');
+                    li.textContent = cls.name; // Assuming class object has a 'name' property
+                    viewStudentClassesList.appendChild(li);
+                });
+                viewStudentNoClasses.classList.add('hidden');
+            } else {
+                viewStudentNoClasses.classList.remove('hidden');
+            }
+
+            viewStudentLoading.style.display = 'none';
+            viewStudentDetails.classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error fetching student details:', error);
+            viewStudentLoading.style.display = 'none';
+            viewStudentError.textContent = `Error loading details: ${error.message}`;
+            viewStudentError.classList.remove('hidden');
+        }
+    }
+
+    // Add ID to the close button if it doesn't have one, or use the existing one
+    document.getElementById('close-view-student-modal').addEventListener('click', closeViewStudentModal);
+
+    // Close modal if clicking outside of it
+    viewStudentModal.addEventListener('click', (event) => {
+        // Check if the click is on the backdrop itself, not the content
+        if (event.target === viewStudentModal) {
+            closeViewStudentModal();
+        }
+    });
+
+    // Make functions globally accessible if needed from index.ejs
+    window.openViewStudentModal = openViewStudentModal;
+    window.closeViewStudentModal = closeViewStudentModal;
+</script>
