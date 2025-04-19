@@ -1,0 +1,118 @@
+<!-- views/admin/classes/view-class-modal.ejs -->
+<div id="view-class-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3 mb-5">
+            <h3 class="text-xl font-semibold text-gray-900" id="view-class-modal-title">Class Details</h3>
+            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="closeViewModal()">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+        <div id="view-class-modal-content">
+            <!-- Loading state -->
+            <div id="view-class-loading" class="text-center py-4">Loading...</div>
+            <!-- Error state -->
+            <div id="view-class-error" class="hidden text-red-600 py-4"></div>
+            <!-- Content -->
+            <div id="view-class-details" class="hidden">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Name:</label>
+                    <p class="mt-1 text-lg text-gray-900" id="view-class-name"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Description:</label>
+                    <p class="mt-1 text-gray-600" id="view-class-description"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Teacher:</label>
+                    <p class="mt-1 text-gray-600" id="view-class-teacher"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Enrolled Students:</label>
+                    <ul id="view-class-students-list" class="mt-1 list-disc list-inside text-gray-600">
+                        <!-- Student names will be populated here -->
+                    </ul>
+                    <p id="view-class-no-students" class="mt-1 text-gray-500 italic hidden">No students enrolled in this class.</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end pt-4 border-t mt-5">
+            <button type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300" onclick="closeViewModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const viewModal = document.getElementById('view-class-modal');
+    const viewModalTitle = document.getElementById('view-class-modal-title');
+    const viewModalContent = document.getElementById('view-class-modal-content');
+    const viewLoading = document.getElementById('view-class-loading');
+    const viewError = document.getElementById('view-class-error');
+    const viewDetails = document.getElementById('view-class-details');
+    const viewClassName = document.getElementById('view-class-name');
+    const viewClassDescription = document.getElementById('view-class-description');
+    const viewClassTeacher = document.getElementById('view-class-teacher');
+    const viewStudentsList = document.getElementById('view-class-students-list');
+    const viewNoStudents = document.getElementById('view-class-no-students');
+
+    function closeViewModal() {
+        viewModal.classList.add('hidden');
+        // Reset state
+        viewLoading.style.display = 'block';
+        viewError.classList.add('hidden');
+        viewError.textContent = '';
+        viewDetails.classList.add('hidden');
+        viewStudentsList.innerHTML = ''; // Clear student list
+        viewNoStudents.classList.add('hidden');
+    }
+
+    async function openViewModal(classId) {
+        viewModal.classList.remove('hidden');
+        viewLoading.style.display = 'block';
+        viewError.classList.add('hidden');
+        viewDetails.classList.add('hidden');
+
+        try {
+            const response = await fetch(`/admin/classes/api/details/${classId}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const { classObj, students } = data;
+
+            // Populate modal
+            viewModalTitle.textContent = `Details for ${classObj.name}`;
+            viewClassName.textContent = classObj.name;
+            viewClassDescription.textContent = classObj.description || 'N/A';
+            viewClassTeacher.textContent = classObj.teacherName || 'Not Assigned';
+
+            viewStudentsList.innerHTML = ''; // Clear previous list
+            if (students && students.length > 0) {
+                students.forEach(student => {
+                    const li = document.createElement('li');
+                    li.textContent = student.name; // Assuming student object has a 'name' property
+                    viewStudentsList.appendChild(li);
+                });
+                viewNoStudents.classList.add('hidden');
+            } else {
+                viewNoStudents.classList.remove('hidden');
+            }
+
+            viewLoading.style.display = 'none';
+            viewDetails.classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error fetching class details:', error);
+            viewLoading.style.display = 'none';
+            viewError.textContent = `Error loading details: ${error.message}`;
+            viewError.classList.remove('hidden');
+        }
+    }
+
+    // Close modal if clicking outside of it
+    viewModal.addEventListener('click', (event) => {
+        if (event.target === viewModal) {
+            closeViewModal();
+        }
+    });
+</script>

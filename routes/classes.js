@@ -105,19 +105,20 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
   }
 });
 
+// --- NEW: API endpoint to get class details for view modal ---
 /**
- * View class details with students - Admin only
- * GET /classes/view/:id
+ * Get class details (for modal) - Admin only
+ * GET /classes/api/details/:id
  */
-router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
+router.get('/api/details/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const classId = req.params.id;
     const classObj = await Class.findById(classId);
-    
+
     if (!classObj) {
-      return res.redirect('/admin/classes?error=Class not found');
+      return res.status(404).json({ error: 'Class not found' });
     }
-    
+
     // Get teacher info if assigned
     if (classObj.teacherId) {
       const teacher = await User.findById(classObj.teacherId);
@@ -125,53 +126,41 @@ router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
     } else {
       classObj.teacherName = 'Not Assigned';
     }
-    
+
     // Get students in this class
     const students = await Student.findByClassId(classId);
-    
-    res.render('admin/classes/view', {
-      user: req.session.user,
-      classObj,
-      students,
-      success: req.query.success,
-      error: req.query.error
-    });
+
+    res.json({ classObj, students });
   } catch (error) {
-    console.error('Error viewing class:', error);
-    res.redirect('/admin/classes?error=' + encodeURIComponent(error.message));
+    console.error('Error fetching class details for modal:', error);
+    res.status(500).json({ error: 'Failed to fetch class details' });
   }
 });
 
+// --- NEW: API endpoint to get data for manage students modal ---
 /**
- * Manage students in class form - Admin only
- * GET /classes/:id/students
+ * Get data for managing students in class (for modal) - Admin only
+ * GET /classes/api/manage/:id
  */
-router.get('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
+router.get('/api/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const classId = req.params.id;
     const classObj = await Class.findById(classId);
-    
+
     if (!classObj) {
-      return res.redirect('/admin/classes?error=Class not found');
+      return res.status(404).json({ error: 'Class not found' });
     }
-    
+
     // Get all students
     const allStudents = await Student.findAll();
-    
-    // Get students in this class
+
+    // Get students currently enrolled in this class
     const enrolledStudentIds = await StudentClass.findStudentsByClass(classId);
-    
-    res.render('admin/classes/manage-students', {
-      user: req.session.user,
-      classObj,
-      allStudents,
-      enrolledStudentIds,
-      success: req.query.success,
-      error: req.query.error
-    });
+
+    res.json({ classObj, allStudents, enrolledStudentIds });
   } catch (error) {
-    console.error('Error loading manage students form:', error);
-    res.redirect('/admin/classes?error=' + encodeURIComponent(error.message));
+    console.error('Error fetching data for manage students modal:', error);
+    res.status(500).json({ error: 'Failed to fetch data for managing students' });
   }
 });
 
@@ -183,32 +172,35 @@ router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const classId = req.params.id;
     const { studentIds } = req.body;
-    
+
     // Get current students in class
     const currentStudentIds = await StudentClass.findStudentsByClass(classId);
-    
+
     // Convert to array, handling case of no students selected
     const newStudentIds = studentIds ? (Array.isArray(studentIds) ? studentIds : [studentIds]) : [];
-    
+
     // Remove students that were unselected
     for (const currentId of currentStudentIds) {
       if (!newStudentIds.includes(currentId)) {
         await Student.removeFromClass(currentId, classId);
       }
     }
-    
+
     // Add newly selected students
     for (const newId of newStudentIds) {
       if (!currentStudentIds.includes(newId)) {
         await Student.enrollInClass(newId, classId);
       }
     }
-    
+
     req.session.success = 'Students updated successfully';
-    res.redirect(`/admin/classes/view/${classId}`);
+    // --- UPDATED: Redirect back to the main classes list ---
+    res.redirect(`/admin/classes`);
   } catch (error) {
     console.error('Error updating students in class:', error);
-    res.redirect(`/admin/classes/${req.params.id}/students?error=${encodeURIComponent(error.message)}`);
+    // --- UPDATED: Redirect back to the main classes list with error ---
+    req.session.error = error.message || 'Failed to update students';
+    res.redirect(`/admin/classes`);
   }
 });
 

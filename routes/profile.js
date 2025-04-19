@@ -32,10 +32,10 @@ router.post('/update', isAuthenticated, async (req, res) => {
     req.session.user = updatedUser;
     
     req.session.success = 'Profile updated successfully';
-    res.redirect('/profile/edit');
+    res.redirect('/profile'); // Changed redirect from /profile/edit
   } catch (error) {
     console.error('Profile update error:', error);
-    res.redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+    res.redirect(`/profile?error=${encodeURIComponent(error.message)}`); // Changed redirect from /profile/edit
   }
 });
 
@@ -50,22 +50,22 @@ router.post('/password', isAuthenticated, async (req, res) => {
     
     // Validate new password
     if (!newPassword || newPassword.length < 6) {
-      return res.redirect('/profile/edit?error=New password must be at least 6 characters');
+      return res.redirect('/profile?error=New password must be at least 6 characters'); // Changed redirect from /profile/edit
     }
     
     // Check if passwords match
     if (newPassword !== confirmPassword) {
-      return res.redirect('/profile/edit?error=New passwords do not match');
+      return res.redirect('/profile?error=New passwords do not match'); // Changed redirect from /profile/edit
     }
     
     // Update password
     await User.updatePassword(userId, currentPassword, newPassword);
     
     req.session.success = 'Password updated successfully';
-    res.redirect('/profile/edit');
+    res.redirect('/profile'); // Changed redirect from /profile/edit
   } catch (error) {
     console.error('Password update error:', error);
-    res.redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+    res.redirect(`/profile?error=${encodeURIComponent(error.message)}`); // Changed redirect from /profile/edit
   }
 });
 
