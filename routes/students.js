@@ -49,6 +49,42 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * Create new student - Admin only
+ * POST /students/create
+ */
+router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { name, dateOfBirth, parentIds } = req.body;
+
+    // Basic validation
+    if (!name || !dateOfBirth) {
+      req.session.error = 'Student name and date of birth are required.';
+      req.session.values = req.body; // Pass back submitted values
+      return res.redirect('/admin/students');
+    }
+
+    // Create the student
+    const newStudent = await Student.create({ name, dateOfBirth });
+
+    // Assign parents if provided
+    if (parentIds) {
+      const ids = Array.isArray(parentIds) ? parentIds : [parentIds];
+      for (const parentId of ids) {
+        await Student.addParent(newStudent._id, parentId);
+      }
+    }
+
+    req.session.success = 'Student created successfully';
+    res.redirect('/admin/students');
+  } catch (error) {
+    console.error('Error creating student:', error);
+    req.session.error = error.message || 'Failed to create student';
+    req.session.values = req.body; // Pass back submitted values on error
+    res.redirect('/admin/students');
+  }
+});
+
+/**
  * Delete student - Admin only
  * POST /students/delete/:id
  */

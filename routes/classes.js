@@ -56,6 +56,38 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * Create new class - Admin only
+ * POST /classes/create
+ */
+router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { name, description, teacherId } = req.body;
+
+    // Basic validation
+    if (!name) {
+      req.session.error = 'Class name is required.';
+      req.session.values = req.body; // Pass back submitted values
+      return res.redirect('/admin/classes');
+    }
+
+    // Create the class
+    await Class.create({ 
+      name,
+      description: description || '', // Handle optional description
+      teacherId: teacherId || null // Handle optional teacher
+    });
+
+    req.session.success = 'Class created successfully';
+    res.redirect('/admin/classes');
+  } catch (error) {
+    console.error('Error creating class:', error);
+    req.session.error = error.message || 'Failed to create class';
+    req.session.values = req.body; // Pass back submitted values on error
+    res.redirect('/admin/classes');
+  }
+});
+
+/**
  * Delete class - Admin only
  * POST /classes/delete/:id
  */

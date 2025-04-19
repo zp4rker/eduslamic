@@ -56,7 +56,7 @@
 
     function showEditStudentModal(studentId, studentName, dob) {
         // Set form action URL
-        editStudentForm.action = `/students/edit/${studentId}`;
+        editStudentForm.action = `/admin/students/edit/${studentId}`; // Corrected path
 
         // Fill form fields
         editStudentTitle.textContent = studentName;

@@ -52,7 +52,7 @@
 
     function showEditClassModal(classId, className, description, teacherId) {
         // Set form action URL
-        editClassForm.action = `/classes/edit/${classId}`;
+        editClassForm.action = `/admin/classes/edit/${classId}`; // Corrected path
 
         // Fill form fields
         editClassTitle.textContent = className;

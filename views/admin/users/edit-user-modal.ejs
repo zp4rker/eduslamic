@@ -63,8 +63,8 @@
     // Function to show the modal with animation and populate data
     window.showEditUserModal = function(userId, userName, userEmail, userPhone, userRoles) {
         // Set form action URL
-        editUserForm.action = `/users/edit/${userId}`;
-        
+        editUserForm.action = `/admin/users/edit/${userId}`; // Corrected path
+
         // Fill form fields
         editUserTitle.textContent = userName;
         editNameInput.value = userName;
