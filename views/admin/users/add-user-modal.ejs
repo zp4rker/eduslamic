@@ -26,13 +26,20 @@
             </div>
 
             <div>
-                <label for="role" class="block text-sm font-medium text-gray-700">Role *</label>
-                <select id="role" name="role" required class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="">Select Role</option>
+                <label class="block text-sm font-medium text-gray-700">Roles *</label>
+                <div class="mt-2 space-y-2">
                     <% Object.values(roles).forEach(role => { %>
-                        <option value="<%= role %>" <%= typeof values !== 'undefined' && values.role === role ? 'selected' : '' %>><%= role.charAt(0).toUpperCase() + role.slice(1) %></option>
+                        <div class="flex items-center">
+                            <input id="add-role-<%= role %>" name="roles" type="checkbox" value="<%= role %>" 
+                                   <% if (typeof values !== 'undefined' && values.roles && values.roles.includes(role)) { %>checked<% } %>
+                                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                            <label for="add-role-<%= role %>" class="ml-3 block text-sm text-gray-900">
+                                <%= role.charAt(0).toUpperCase() + role.slice(1) %>
+                            </label>
+                        </div>
                     <% }); %>
-                </select>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Select at least one role.</p>
             </div>
 
             <div>

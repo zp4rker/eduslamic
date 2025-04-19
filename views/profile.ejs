@@ -35,20 +35,31 @@
                   <dd class="mt-1 text-sm text-gray-900"><%= user.phone || 'Not specified' %></dd>
                 </div>
                 <div class="sm:col-span-1">
-                  <dt class="text-sm font-medium text-gray-500">Role</dt>
-                  <dd class="mt-1 text-sm text-gray-900">
+                  <dt class="text-sm font-medium text-gray-500">Roles</dt>
+                  <dd class="mt-1 text-sm text-gray-900 space-x-1">
                     <% 
-                    let roleBadgeClass = '';
-                    switch(user.role) {
-                        case 'admin': roleBadgeClass = 'bg-red-100 text-red-800'; break;
-                        case 'teacher': roleBadgeClass = 'bg-blue-100 text-blue-800'; break;
-                        case 'parent': roleBadgeClass = 'bg-green-100 text-green-800'; break;
-                        default: roleBadgeClass = 'bg-gray-100 text-gray-800';
-                    }
-                    %>
-                    <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <%= roleBadgeClass %>">
-                        <%= user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : 'Unknown' %>
-                    </span>
+                    // Function to get badge class based on role
+                    const getRoleBadgeClass = (role) => {
+                        switch(role) {
+                            case 'admin': return 'bg-red-100 text-red-800';
+                            case 'teacher': return 'bg-blue-100 text-blue-800';
+                            case 'parent': return 'bg-green-100 text-green-800';
+                            default: return 'bg-gray-100 text-gray-800';
+                        }
+                    };
+
+                    // Check if user.roles exists and is an array
+                    if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+                        user.roles.forEach(role => { %>
+                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <%= getRoleBadgeClass(role) %>">
+                                <%= role.charAt(0).toUpperCase() + role.slice(1) %>
+                            </span>
+                        <% }); 
+                    } else { %>
+                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                            No roles assigned
+                        </span>
+                    <% } %>
                   </dd>
                 </div>
               </dl>

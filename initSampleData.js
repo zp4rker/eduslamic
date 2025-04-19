@@ -10,28 +10,35 @@ const StudentParent = require('./models/StudentParent');
  */
 async function initSampleData() {
   try {
-    // Define default users
+    // Define default users with roles array
     const defaultUsers = [
       {
         name: 'Admin User',
         email: 'admin@example.com',
         phone: '1234567890',
         password: 'admin123',
-        role: ROLES.ADMIN
+        roles: [ROLES.ADMIN] // Changed from role to roles array
       },
       {
         name: 'Teacher User',
         email: 'teacher@example.com',
         phone: '2345678901',
         password: 'teacher123',
-        role: ROLES.TEACHER
+        roles: [ROLES.TEACHER] // Changed from role to roles array
       },
       {
         name: 'Parent User',
         email: 'parent@example.com',
         phone: '3456789012',
         password: 'parent123',
-        role: ROLES.PARENT
+        roles: [ROLES.PARENT] // Changed from role to roles array
+      },
+      {
+        name: 'Multi Role User', // Example of a user with multiple roles
+        email: 'multi@example.com',
+        phone: '4567890123',
+        password: 'multi123',
+        roles: [ROLES.TEACHER, ROLES.PARENT] // Assign multiple roles
       }
     ];
 
@@ -41,14 +48,16 @@ async function initSampleData() {
       const existingUser = await User.findByEmail(userData.email);
       
       if (!existingUser) {
-        console.log(`Creating default ${userData.role} user...`);
-        await User.create(userData);
-        console.log(`Default ${userData.role} user created successfully`);
+        const rolesString = userData.roles.join(', ');
+        console.log(`Creating default user with roles: ${rolesString}...`);
+        await User.create(userData); // User.create now expects roles array
+        console.log(`Default user created successfully`);
         console.log(`Email: ${userData.email}`);
         console.log(`Password: ${userData.password}`);
-        console.log(`Role: ${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)}`);
+        console.log(`Roles: ${rolesString}`);
       } else {
-        console.log(`Default ${userData.role} user already exists`);
+        const rolesString = existingUser.roles ? existingUser.roles.join(', ') : 'N/A';
+        console.log(`Default user with email ${userData.email} (Roles: ${rolesString}) already exists`);
       }
     }
 

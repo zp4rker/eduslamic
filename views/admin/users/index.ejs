@@ -35,7 +35,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Phone</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Role</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Roles</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Created At</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                             </tr>
@@ -48,17 +48,28 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= user.phone || 'N/A' %></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         <% 
-                                        let roleBadgeClass = '';
-                                        switch(user.role) {
-                                            case 'admin': roleBadgeClass = 'bg-red-100 text-red-800'; break;
-                                            case 'teacher': roleBadgeClass = 'bg-blue-100 text-blue-800'; break;
-                                            case 'parent': roleBadgeClass = 'bg-green-100 text-green-800'; break;
-                                            default: roleBadgeClass = 'bg-gray-100 text-gray-800';
-                                        }
-                                        %>
-                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <%= roleBadgeClass %>">
-                                            <%= user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : 'Unknown' %>
-                                        </span>
+                                        // Function to get badge class based on role
+                                        const getRoleBadgeClass = (role) => {
+                                            switch(role) {
+                                                case 'admin': return 'bg-red-100 text-red-800';
+                                                case 'teacher': return 'bg-blue-100 text-blue-800';
+                                                case 'parent': return 'bg-green-100 text-green-800';
+                                                default: return 'bg-gray-100 text-gray-800';
+                                            }
+                                        };
+
+                                        // Check if user.roles exists and is an array
+                                        if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+                                            user.roles.forEach(role => { %>
+                                                <span class="mr-1 px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <%= getRoleBadgeClass(role) %>">
+                                                    <%= role.charAt(0).toUpperCase() + role.slice(1) %>
+                                                </span>
+                                            <% }); 
+                                        } else { %>
+                                            <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                No roles
+                                            </span>
+                                        <% } %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= new Date(user.createdAt).toLocaleDateString() %></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -66,7 +77,11 @@
                                             <button 
                                                 type="button" 
                                                 class="edit-user-button p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
-                                                onclick="window.showEditUserModal('<%= user._id %>', '<%= user.name %>', '<%= user.email %>', '<%= user.phone || '' %>', '<%= user.role %>')"
+                                                data-user-id="<%= user._id %>"
+                                                data-user-name="<%= user.name %>"
+                                                data-user-email="<%= user.email %>"
+                                                data-user-phone="<%= user.phone || '' %>"
+                                                data-user-roles='<%- JSON.stringify(user.roles || []) %>'
                                                 title="Edit User">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                             </button>
@@ -122,3 +137,34 @@
     <%- include('./edit-user-modal') %>
     <%- include('./reset-password-modal') %>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userTableBody = document.querySelector('tbody'); // Adjust selector if needed
+
+    if (userTableBody) {
+        userTableBody.addEventListener('click', function(event) {
+            const button = event.target.closest('.edit-user-button');
+            if (button) {
+                try {
+                    // Retrieve data using dataset (no parsing needed for simple strings)
+                    const userId = button.dataset.userId;
+                    const userName = button.dataset.userName;
+                    const userEmail = button.dataset.userEmail;
+                    const userPhone = button.dataset.userPhone;
+                    const userRoles = JSON.parse(button.dataset.userRoles); // Parse only the roles array
+
+                    if (typeof window.showEditUserModal === 'function') {
+                        window.showEditUserModal(userId, userName, userEmail, userPhone, userRoles);
+                    } else {
+                        console.error('showEditUserModal function not found.');
+                    }
+                } catch (e) {
+                    console.error('Error parsing user data from button attributes or calling modal:', e);
+                    alert('Could not open edit modal. Please check console for errors.');
+                }
+            }
+        });
+    }
+});
+</script>

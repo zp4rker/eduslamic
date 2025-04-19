@@ -47,32 +47,41 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
  */
 router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
   try {
-    const { name, email, phone, role, password, confirmPassword } = req.body;
+    const { name, email, phone, roles, password, confirmPassword } = req.body;
     
+    // Ensure roles is an array and not empty
+    const rolesArray = Array.isArray(roles) ? roles : (roles ? [roles] : []);
+    if (rolesArray.length === 0) {
+      req.session.error = 'At least one role must be selected';
+      req.session.values = { name, email, phone, roles: rolesArray }; // Pass back the (potentially empty) array
+      return res.redirect('/admin/users');
+    }
+
     // Validate passwords match
     if (password !== confirmPassword) {
       req.session.error = 'Passwords do not match';
-      req.session.values = { name, email, phone, role };
+      req.session.values = { name, email, phone, roles: rolesArray };
       return res.redirect('/admin/users'); // Updated path
     }
 
     // Validate password length
     if (password.length < 6) {
       req.session.error = 'Password must be at least 6 characters';
-      req.session.values = { name, email, phone, role };
+      req.session.values = { name, email, phone, roles: rolesArray };
       return res.redirect('/admin/users'); // Updated path
     }
 
-    // Create user
-    await User.create({ name, email, phone, role, password });
+    // Create user with roles array
+    await User.create({ name, email, phone, roles: rolesArray, password });
 
     req.session.success = 'User created successfully';
-    res.redirect('/admin/users'); // Updated path
+    res.redirect('/admin/users');
   } catch (error) {
     console.error('Error creating user:', error);
     req.session.error = error.message || 'Failed to create user';
-    req.session.values = req.body;
-    res.redirect('/admin/users'); // Updated path
+    // Ensure roles is passed back correctly even on error
+    req.session.values = { ...req.body, roles: Array.isArray(req.body.roles) ? req.body.roles : (req.body.roles ? [req.body.roles] : []) };
+    res.redirect('/admin/users');
   }
 });
 
@@ -83,13 +92,21 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
 router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
-    const { name, email, phone, role } = req.body;
+    const { name, email, phone, roles } = req.body;
     
-    // Update user
-    await User.updateProfile(userId, { name, email, phone, role });
+    // Ensure roles is an array and not empty
+    const rolesArray = Array.isArray(roles) ? roles : (roles ? [roles] : []);
+    if (rolesArray.length === 0) {
+      req.session.error = 'At least one role must be selected';
+      // Redirect back, potentially losing other edits if not handled client-side or re-fetched
+      return res.redirect('/admin/users'); 
+    }
+
+    // Update user with roles array
+    await User.updateProfile(userId, { name, email, phone, roles: rolesArray });
 
     req.session.success = 'User updated successfully';
-    res.redirect('/admin/users'); // Updated path
+    res.redirect('/admin/users');
   } catch (error) {
     console.error('Error updating user:', error);
     req.session.error = error.message || 'Failed to update user';

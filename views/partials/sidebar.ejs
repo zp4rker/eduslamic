@@ -8,7 +8,7 @@
                 <i class="fa-solid fa-house mr-3"></i>
                 Dashboard
             </a>
-            <% if (user.role === 'admin') { %>
+            <% if (user.roles && user.roles.includes('admin')) { %>
                 <div>
                     <button id="admin-menu-button" class="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white transition focus:outline-none <%= currentPath.startsWith('/admin') ? 'bg-gray-800 text-white' : '' %>">
                         <span class="flex items-center">
@@ -113,7 +113,7 @@
                 });
 
                 // Admin menu toggle
-                <% if (user.role === 'admin') { %>
+                <% if (user.roles && user.roles.includes('admin')) { %>
                 document.addEventListener('DOMContentLoaded', function() {
                     const adminBtn = document.getElementById('admin-menu-button');
                     const adminMenu = document.getElementById('admin-submenu');

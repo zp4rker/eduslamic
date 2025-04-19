@@ -26,13 +26,19 @@
             </div>
 
             <div>
-                <label for="edit-role" class="block text-sm font-medium text-gray-700">Role *</label>
-                <select id="edit-role" name="role" required class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="">Select Role</option>
+                <label class="block text-sm font-medium text-gray-700">Roles *</label>
+                <div id="edit-roles-container" class="mt-2 space-y-2">
                     <% Object.values(roles).forEach(role => { %>
-                        <option value="<%= role %>"><%= role.charAt(0).toUpperCase() + role.slice(1) %></option>
+                        <div class="flex items-center">
+                            <input id="edit-role-<%= role %>" name="roles" type="checkbox" value="<%= role %>" 
+                                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                            <label for="edit-role-<%= role %>" class="ml-3 block text-sm text-gray-900">
+                                <%= role.charAt(0).toUpperCase() + role.slice(1) %>
+                            </label>
+                        </div>
                     <% }); %>
-                </select>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Select at least one role.</p>
             </div>
 
             <div class="pt-2">
@@ -52,10 +58,10 @@
     const editNameInput = document.getElementById('edit-name');
     const editEmailInput = document.getElementById('edit-email');
     const editPhoneInput = document.getElementById('edit-phone');
-    const editRoleSelect = document.getElementById('edit-role');
+    const editRolesContainer = document.getElementById('edit-roles-container');
 
     // Function to show the modal with animation and populate data
-    window.showEditUserModal = function(userId, userName, userEmail, userPhone, userRole) {
+    window.showEditUserModal = function(userId, userName, userEmail, userPhone, userRoles) {
         // Set form action URL
         editUserForm.action = `/users/edit/${userId}`;
         
@@ -65,13 +71,14 @@
         editEmailInput.value = userEmail;
         editPhoneInput.value = userPhone || ''; // Handle potentially null phone
         
-        // Set role dropdown value
-        for (let i = 0; i < editRoleSelect.options.length; i++) {
-            if (editRoleSelect.options[i].value === userRole) {
-                editRoleSelect.options[i].selected = true;
-                break;
-            }
-        }
+        // Ensure userRoles is an array
+        const rolesArray = Array.isArray(userRoles) ? userRoles : (userRoles ? [userRoles] : []);
+
+        // Set role checkboxes
+        const checkboxes = editRolesContainer.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = rolesArray.includes(checkbox.value);
+        });
 
         // Show modal with animation
         editUserModal.classList.remove('pointer-events-none');

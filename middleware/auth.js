@@ -9,10 +9,13 @@ function isAuthenticated(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-  if (req.session.user && req.session.user.role === ROLES.ADMIN) {
+  // Check if user exists, has roles array, and includes ADMIN role
+  if (req.session.user && Array.isArray(req.session.user.roles) && req.session.user.roles.includes(ROLES.ADMIN)) {
     return next();
   }
-  res.redirect('/');
+  // Optionally add a flash message for unauthorized access
+  // req.flash('error', 'You do not have permission to access this page.');
+  res.redirect('/'); // Redirect non-admins
 }
 
 module.exports = { isAuthenticated, isAdmin };

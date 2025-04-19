@@ -10,7 +10,8 @@
 
     <!-- Role-specific content cards -->
     <div class="space-y-8">
-        <% if (user.role === 'admin') { %>
+        <%# Check if user has the admin role %>
+        <% if (user.roles && user.roles.includes('admin')) { %>
             <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
                 <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
                     <h2 class="text-xl font-semibold text-gray-800">Admin Dashboard</h2>
@@ -34,7 +35,9 @@
                 </div>
             </div>
         <% } %>
-        <% if (user.role === 'teacher') { %>
+        
+        <%# Check if user has the teacher role %>
+        <% if (user.roles && user.roles.includes('teacher')) { %>
             <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
                 <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
                     <h2 class="text-xl font-semibold text-gray-800">Teacher Dashboard</h2>
@@ -54,7 +57,9 @@
                 </div>
             </div>
         <% } %>
-        <% if (user.role === 'parent') { %>
+        
+        <%# Check if user has the parent role %>
+        <% if (user.roles && user.roles.includes('parent')) { %>
             <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
                 <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
                     <h2 class="text-xl font-semibold text-gray-800">Parent Dashboard</h2>

@@ -5,15 +5,6 @@ PouchDB.plugin(require('pouchdb-find'));
 
 const db = new PouchDB('users');
 
-async function initializeIndexes() {
-  try {
-    await db.createIndex({ index: { fields: ['email'] } });
-    console.log('Email index created successfully');
-  } catch (err) {
-    console.error('Error creating index:', err);
-  }
-}
-
 // Define valid roles
 const ROLES = {
   ADMIN: 'admin',
@@ -21,10 +12,58 @@ const ROLES = {
   PARENT: 'parent'
 };
 
+// Design doc for views
+const designDoc = {
+  _id: '_design/users',
+  views: {
+    by_role: {
+      map: function (doc) {
+        if (doc.roles && Array.isArray(doc.roles)) {
+          doc.roles.forEach(function(role) {
+            emit(role, doc);
+          });
+        }
+      }.toString()
+    }
+  }
+};
+
+// Initialize design doc
+async function initializeDesignDocs() {
+  try {
+    await db.put(designDoc);
+    console.log('User design document created/updated successfully');
+  } catch (err) {
+    if (err.name !== 'conflict') {
+      console.error('Error creating/updating user design document:', err);
+    } else {
+      console.log('User design document already exists');
+      try {
+        const doc = await db.get('_design/users');
+        designDoc._rev = doc._rev;
+        await db.put(designDoc);
+        console.log('User design document updated successfully');
+      } catch (updateErr) {
+        console.error('Error updating user design document:', updateErr);
+      }
+    }
+  }
+}
+
+async function initializeIndexes() {
+  try {
+    await db.createIndex({ index: { fields: ['email'] } });
+    console.log('Email index created successfully');
+    await initializeDesignDocs(); // Initialize design docs here
+  } catch (err) {
+    console.error('Error creating index or design doc:', err);
+  }
+}
+
 class User {
   /**
    * Create a new user
-   * @param {Object} userData - User data including name, email, phone, password, and role
+   * @param {Object} userData - User data including name, email, phone, password, and roles (array or string)
    * @returns {Promise<Object>} - The created user object
    */
   static async create(userData) {
@@ -39,10 +78,16 @@ class User {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-      // Validate role or set default to parent
-      const role = userData.role && Object.values(ROLES).includes(userData.role) 
-        ? userData.role 
-        : ROLES.PARENT;
+      // Validate roles or set default to parent
+      let roles = [];
+      if (userData.roles) {
+        const requestedRoles = Array.isArray(userData.roles) ? userData.roles : [userData.roles];
+        roles = requestedRoles.filter(role => Object.values(ROLES).includes(role));
+      }
+      
+      if (roles.length === 0) {
+        roles = [ROLES.PARENT]; // Default role
+      }
 
       // Create user document with UUID (no prefix)
       const user = {
@@ -51,7 +96,7 @@ class User {
         email: userData.email,
         phone: userData.phone,
         password: hashedPassword,
-        role: role,
+        roles: roles, // Changed from role to roles (array)
         createdAt: new Date().toISOString()
       };
 
@@ -116,7 +161,7 @@ class User {
   /**
    * Update user information
    * @param {string} userId - User's ID
-   * @param {Object} updateData - Data to update (name, email, phone, role)
+   * @param {Object} updateData - Data to update (name, email, phone, roles)
    * @returns {Promise<Object>} - The updated user object
    */
   static async updateProfile(userId, updateData) {
@@ -132,18 +177,23 @@ class User {
         }
       }
       
-      // Validate role if provided
-      if (updateData.role && !Object.values(ROLES).includes(updateData.role)) {
-        throw new Error('Invalid role provided');
+      // Validate roles if provided
+      let newRoles = user.roles; // Keep existing roles by default
+      if (updateData.roles) {
+        const requestedRoles = Array.isArray(updateData.roles) ? updateData.roles : [updateData.roles];
+        const validRoles = requestedRoles.filter(role => Object.values(ROLES).includes(role));
+        if (validRoles.length > 0) { // Only update if at least one valid role is provided
+          newRoles = validRoles;
+        } else {
+          console.warn(`Update for user ${userId} provided invalid/empty roles. Keeping existing roles.`);
+        }
       }
       
       // Update user properties
       user.name = updateData.name || user.name;
       user.email = updateData.email || user.email;
       user.phone = updateData.phone || user.phone;
-      if (updateData.role) {
-        user.role = updateData.role;
-      }
+      user.roles = newRoles; // Update roles
       user.updatedAt = new Date().toISOString();
       
       // Save the updated document
@@ -211,7 +261,7 @@ class User {
   }
 
   /**
-   * Find users by role
+   * Find users by role using the map/reduce view
    * @param {string} role - Role to filter by
    * @returns {Promise<Array<Object>>} - Array of users with the given role
    */
@@ -221,15 +271,34 @@ class User {
         throw new Error('Invalid role');
       }
 
-      const result = await db.find({
-        selector: { role: role }
+      // Use the view to find users by role
+      const result = await db.query('users/by_role', {
+        key: role,
+        include_docs: true
       });
 
-      return result.docs.map(user => {
-        const { password, ...userWithoutPassword } = user;
+      return result.rows.map(row => {
+        const { password, ...userWithoutPassword } = row.doc;
         return userWithoutPassword;
       });
     } catch (error) {
+      if (error.name === 'not_found' && error.message.includes('_design/users')) {
+        console.error("User 'by_role' view not found. Make sure initializeIndexes() has run.");
+        await initializeDesignDocs();
+        try {
+          const retryResult = await db.query('users/by_role', {
+            key: role,
+            include_docs: true
+          });
+          return retryResult.rows.map(row => {
+            const { password, ...userWithoutPassword } = row.doc;
+            return userWithoutPassword;
+          });
+        } catch (retryError) {
+          console.error("Retry failed after attempting to initialize design doc:", retryError);
+          throw retryError;
+        }
+      }
       throw error;
     }
   }
@@ -243,8 +312,12 @@ class User {
   static async hasRole(userId, role) {
     try {
       const user = await this.findById(userId);
-      return user && user.role === role;
+      return user && Array.isArray(user.roles) && user.roles.includes(role);
     } catch (error) {
+      if (error.name === 'not_found') {
+        return false;
+      }
+      console.error(`Error checking role for user ${userId}:`, error);
       return false;
     }
   }
@@ -277,7 +350,6 @@ class User {
       });
       
       return result.rows
-        // Filter out system documents (IDs that start with _) and documents without required fields
         .filter(row => row.doc && 
                        row.doc._id && 
                        !row.doc._id.startsWith('_') && 
