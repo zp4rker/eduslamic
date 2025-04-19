@@ -35,10 +35,18 @@
                         <i class="fa-solid fa-user"></i>
                     </span>
                     <span class="flex-1 text-left truncate"><%= user.name %></span>
-                    <i class="fa-solid fa-chevron-up w-5 h-5 text-gray-400"></i>
+                    <i class="fa-solid fa-chevron-up w-5 h-5 text-gray-400 transform transition-transform duration-200"></i>
                 </button>
                 <!-- Dropdown Menu -->
-                <div id="profile-menu-dropdown" class="hidden absolute left-0 bottom-full mb-2 w-56 origin-bottom-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 py-1">
+                <div id="profile-menu-dropdown" 
+                     class="absolute left-0 bottom-full mb-2 w-56 origin-bottom-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 py-1 transition ease-out duration-100 transform opacity-0 scale-95"
+                     data-transition-enter="transition ease-out duration-100"
+                     data-transition-enter-start="transform opacity-0 scale-95"
+                     data-transition-enter-end="transform opacity-100 scale-100"
+                     data-transition-leave="transition ease-in duration-75"
+                     data-transition-leave-start="transform opacity-100 scale-100"
+                     data-transition-leave-end="transform opacity-0 scale-95"
+                     style="display: none;">
                     <a href="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <%= currentPath === '/profile' ? 'bg-gray-100' : '' %>">
                         <i class="fa-solid fa-user-circle text-gray-500"></i>
                         Your Profile
@@ -54,18 +62,51 @@
                 document.addEventListener('DOMContentLoaded', function() {
                     const btn = document.getElementById('profile-menu-button');
                     const menu = document.getElementById('profile-menu-dropdown');
-                    
-                    if (btn && menu) {
+                    const chevron = btn.querySelector('i.fa-chevron-up'); // Get the chevron icon
+
+                    if (btn && menu && chevron) {
+                        // Function to open the menu
+                        function openMenu() {
+                            menu.style.display = 'block';
+                            requestAnimationFrame(() => {
+                                menu.classList.remove(...menu.dataset.transitionLeaveEnd.split(' '));
+                                menu.classList.add(...menu.dataset.transitionEnterStart.split(' '));
+                                requestAnimationFrame(() => {
+                                    menu.classList.remove(...menu.dataset.transitionEnterStart.split(' '));
+                                    menu.classList.add(...menu.dataset.transitionEnterEnd.split(' '));
+                                    chevron.classList.add('rotate-180'); // Rotate chevron down
+                                });
+                            });
+                        }
+
+                        // Function to close the menu
+                        function closeMenu() {
+                            menu.classList.remove(...menu.dataset.transitionEnterEnd.split(' '));
+                            menu.classList.add(...menu.dataset.transitionLeaveStart.split(' '));
+                            requestAnimationFrame(() => {
+                                menu.classList.remove(...menu.dataset.transitionLeaveStart.split(' '));
+                                menu.classList.add(...menu.dataset.transitionLeaveEnd.split(' '));
+                                setTimeout(() => {
+                                    menu.style.display = 'none';
+                                    chevron.classList.remove('rotate-180'); // Rotate chevron back up
+                                }, 75); // Match leave duration
+                            });
+                        }
+
                         // Toggle menu on button click
                         btn.addEventListener('click', function(e) {
                             e.stopPropagation(); // Prevent click from immediately closing menu
-                            menu.classList.toggle('hidden');
+                            if (menu.style.display === 'none') {
+                                openMenu();
+                            } else {
+                                closeMenu();
+                            }
                         });
 
                         // Close menu if clicking outside
                         document.addEventListener('click', function(e) {
-                            if (!menu.classList.contains('hidden') && !btn.contains(e.target) && !menu.contains(e.target)) {
-                                menu.classList.add('hidden');
+                            if (menu.style.display !== 'none' && !btn.contains(e.target) && !menu.contains(e.target)) {
+                                closeMenu();
                             }
                         });
                     }
