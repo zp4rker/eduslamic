@@ -1,0 +1,69 @@
+<!-- Modal for deleting user -->
+<div id="delete-user-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-red-700">Confirm Deletion</h3>
+            <button id="close-delete-user-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="delete-user-form" action="" method="POST" class="px-6 py-6 space-y-4">
+            <input type="hidden" name="_method" value="DELETE">
+            <p class="text-sm text-gray-700">Are you sure you want to delete user: <strong id="delete-user-name"></strong>? This action cannot be undone.</p>
+
+            <div class="pt-2 flex justify-end space-x-3">
+                 <button type="button" id="cancel-delete-user-modal" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Cancel
+                </button>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
+                    Delete User
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const deleteUserModal = document.getElementById('delete-user-modal');
+    const deleteUserModalContent = deleteUserModal.querySelector('.bg-white');
+    const deleteUserForm = document.getElementById('delete-user-form');
+    const deleteUserNameSpan = document.getElementById('delete-user-name');
+
+    // Function to show the modal with animation and populate data
+    window.showDeleteUserModal = function(userId, userName) {
+        // Set form action URL
+        deleteUserForm.action = `/admin/users/delete/${userId}?_method=DELETE`; // Use query param for method override
+
+        // Set user name in confirmation message
+        deleteUserNameSpan.textContent = userName;
+
+        // Show modal with animation
+        deleteUserModal.classList.remove('pointer-events-none');
+        deleteUserModal.classList.remove('opacity-0');
+        deleteUserModalContent.classList.remove('opacity-0', 'scale-95');
+        deleteUserModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    // Function to hide the modal with animation
+    window.hideDeleteUserModal = function() {
+        deleteUserModal.classList.add('opacity-0');
+        deleteUserModalContent.classList.add('opacity-0', 'scale-95');
+        deleteUserModalContent.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            deleteUserModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    document.getElementById('close-delete-user-modal').addEventListener('click', window.hideDeleteUserModal);
+    document.getElementById('cancel-delete-user-modal').addEventListener('click', window.hideDeleteUserModal);
+
+
+    // Close modal on background click
+    deleteUserModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            window.hideDeleteUserModal();
+        }
+    });
+</script>

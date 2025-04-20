@@ -1,0 +1,68 @@
+<!-- Modal for deleting class -->
+<div id="delete-class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transition-all duration-300 ease-out transform scale-95 opacity-0">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-red-700">Confirm Deletion</h3>
+            <button id="close-delete-class-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="delete-class-form" action="" method="POST" class="px-6 py-6 space-y-4">
+            <input type="hidden" name="_method" value="DELETE">
+            <p class="text-sm text-gray-700">Are you sure you want to delete class: <strong id="delete-class-name"></strong>? This action cannot be undone.</p>
+
+            <div class="pt-2 flex justify-end space-x-3">
+                 <button type="button" id="cancel-delete-class-modal" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Cancel
+                </button>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
+                    Delete Class
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const deleteClassModal = document.getElementById('delete-class-modal');
+    const deleteClassModalContent = deleteClassModal.querySelector('.bg-white');
+    const deleteClassForm = document.getElementById('delete-class-form');
+    const deleteClassNameSpan = document.getElementById('delete-class-name');
+
+    // Function to show the modal with animation and populate data
+    window.showDeleteClassModal = function(classId, className) {
+        // Set form action URL
+        deleteClassForm.action = `/admin/classes/delete/${classId}?_method=DELETE`; // Use query param for method override
+
+        // Set class name in confirmation message
+        deleteClassNameSpan.textContent = className;
+
+        // Show modal with animation
+        deleteClassModal.classList.remove('pointer-events-none');
+        deleteClassModal.classList.remove('opacity-0');
+        deleteClassModalContent.classList.remove('opacity-0', 'scale-95');
+        deleteClassModalContent.classList.add('opacity-100', 'scale-100');
+    }
+
+    // Function to hide the modal with animation
+    window.hideDeleteClassModal = function() {
+        deleteClassModal.classList.add('opacity-0');
+        deleteClassModalContent.classList.add('opacity-0', 'scale-95');
+        deleteClassModalContent.classList.remove('opacity-100', 'scale-100');
+        setTimeout(() => {
+            deleteClassModal.classList.add('pointer-events-none');
+        }, 300); // Match duration-300
+    }
+
+    document.getElementById('close-delete-class-modal').addEventListener('click', window.hideDeleteClassModal);
+    document.getElementById('cancel-delete-class-modal').addEventListener('click', window.hideDeleteClassModal);
+
+    // Close modal on background click
+    deleteClassModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            window.hideDeleteClassModal();
+        }
+    });
+</script>
