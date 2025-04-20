@@ -74,17 +74,12 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= new Date(user.createdAt).toLocaleDateString() %></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center space-x-2">
-                                            <button 
-                                                type="button" 
-                                                class="edit-user-button p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
-                                                data-user-id="<%= user._id %>"
-                                                data-user-name="<%= user.name %>"
-                                                data-user-email="<%= user.email %>"
-                                                data-user-phone="<%= user.phone || '' %>"
-                                                data-user-roles='<%- JSON.stringify(user.roles || []) %>'
+                                            <a 
+                                                href="/admin/users/edit/<%= user._id %>" 
+                                                class="p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
                                                 title="Edit User">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                            </button>
+                                            </a>
                                             <button 
                                                 type="button" 
                                                 class="reset-password-button p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
@@ -134,44 +129,14 @@
         </div>
     </div>
 
-    <!-- Include modals -->
     <%- include('./add-user-modal') %>
-    <%- include('./edit-user-modal') %>
+    
     <%- include('./reset-password-modal') %>
     <%- include('./delete-user-modal') %>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const userTableBody = document.querySelector('tbody'); // Adjust selector if needed
-
-    if (userTableBody) {
-        userTableBody.addEventListener('click', function(event) {
-            const editButton = event.target.closest('.edit-user-button');
-            const deleteButton = event.target.closest('.delete-user-button');
-
-            if (editButton) {
-                try {
-                    // Retrieve data using dataset (no parsing needed for simple strings)
-                    const userId = editButton.dataset.userId;
-                    const userName = editButton.dataset.userName;
-                    const userEmail = editButton.dataset.userEmail;
-                    const userPhone = editButton.dataset.userPhone;
-                    const userRoles = JSON.parse(editButton.dataset.userRoles); // Parse only the roles array
-
-                    if (typeof window.showEditUserModal === 'function') {
-                        window.showEditUserModal(userId, userName, userEmail, userPhone, userRoles);
-                    } else {
-                        console.error('showEditUserModal function not found.');
-                    }
-                } catch (e) {
-                    console.error('Error parsing user data from button attributes or calling modal:', e);
-                    alert('Could not open edit modal. Please check console for errors.');
-                }
-            }
-            
-            // No specific logic needed here for delete, handled by onclick
-        });
-    }
+    // Keep other event listeners if needed, e.g., for delete confirmation if it uses JS
 });
 </script>

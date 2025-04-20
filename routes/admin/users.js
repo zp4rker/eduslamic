@@ -86,31 +86,77 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the edit user page - Admin only
+ * GET /users/edit/:id
+ */
+router.get('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userToEdit = await User.findById(userId);
+
+    if (!userToEdit) {
+      req.session.error = 'User not found';
+      return res.redirect('/admin/users');
+    }
+
+    // Retrieve and clear potential error/values from session (e.g., from failed POST)
+    const error = req.session.error;
+    const values = req.session.values;
+    req.session.error = null;
+    req.session.values = null;
+
+    res.render('admin/users/edit', { // Render the new edit page
+      title: `Edit User: ${userToEdit.name}`,
+      user: req.session.user,
+      userToEdit,
+      allRoles: Object.values(ROLES), // Pass all available roles
+      error: error, // Pass error from session if exists
+      values: values || userToEdit, // Pass values from session or user data
+      // csrfToken: req.csrfToken() // Optional: Add CSRF token if using csurf
+    });
+
+  } catch (error) {
+    console.error('Error fetching user for edit page:', error);
+    req.session.error = 'Failed to load user data for editing.';
+    res.redirect('/admin/users');
+  }
+});
+
+/**
  * Update user - Admin only
  * POST /users/edit/:id
  */
 router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  const userId = req.params.id; // Get userId here for use in catch block
   try {
-    const userId = req.params.id;
     const { name, email, phone, roles } = req.body;
     
     // Ensure roles is an array and not empty
     const rolesArray = Array.isArray(roles) ? roles : (roles ? [roles] : []);
     if (rolesArray.length === 0) {
       req.session.error = 'At least one role must be selected';
-      // Redirect back, potentially losing other edits if not handled client-side or re-fetched
-      return res.redirect('/admin/users'); 
+      req.session.values = req.body; // Pass back submitted values
+      // Redirect back to the edit page for this specific user
+      return res.redirect(`/admin/users/edit/${userId}`); 
+    }
+
+    // Basic validation for name and email (add more as needed)
+     if (!name || !email) {
+      req.session.error = 'Name and Email are required.';
+      req.session.values = req.body;
+      return res.redirect(`/admin/users/edit/${userId}`);
     }
 
     // Update user with roles array
     await User.updateProfile(userId, { name, email, phone, roles: rolesArray });
 
     req.session.success = 'User updated successfully';
-    res.redirect('/admin/users');
+    res.redirect('/admin/users'); // Redirect to the user list on success
   } catch (error) {
     console.error('Error updating user:', error);
     req.session.error = error.message || 'Failed to update user';
-    res.redirect('/admin/users'); // Updated path
+    req.session.values = req.body; // Pass back submitted values on error
+    res.redirect(`/admin/users/edit/${userId}`); // Redirect back to the edit page on error
   }
 });
 
