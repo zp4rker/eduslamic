@@ -151,35 +151,6 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
- * View student details - Admin only
- * GET /students/view/:id
- */
-router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
-  try {
-    const studentId = req.params.id;
-    const student = await Student.getCompleteProfile(studentId);
-    
-    if (!student) {
-      return res.redirect('/admin/students?error=Student not found'); // Updated path
-    }
-    
-    // Format date of birth
-    if (student.dateOfBirth) {
-      const dob = new Date(student.dateOfBirth);
-      student.formattedDob = dob.toLocaleDateString();
-    }
-    
-    res.render('admin/students/view', { // Updated path
-      user: req.session.user,
-      student
-    });
-  } catch (error) {
-    console.error('Error viewing student:', error);
-    res.redirect('/admin/students?error=' + encodeURIComponent(error.message)); // Updated path
-  }
-});
-
-/**
  * API endpoint to get student details for modal view
  * GET /admin/students/api/details/:id
  */
