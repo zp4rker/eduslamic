@@ -105,6 +105,50 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
   }
 });
 
+/**
+ * Update class details - Admin only
+ * POST /classes/edit/:id
+ */
+router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const classId = req.params.id;
+    const { name, description, teacherId } = req.body;
+
+    // Basic validation
+    if (!name) {
+      req.session.error = 'Class name is required.';
+      // Note: We don't have req.session.values persistence for modals easily here.
+      // Consider client-side validation or more complex state management if needed.
+      return res.redirect('/admin/classes?error=Class name required'); // Redirect with query param
+    }
+
+    // Prepare update data
+    const updateData = {
+      name,
+      description: description || '',
+      teacherId: teacherId || null
+    };
+
+    // Update the class (Assuming Class.update method exists)
+    // You might need to implement Class.update(id, data) in models/Class.js
+    const updated = await Class.update(classId, updateData);
+
+    if (updated) {
+      req.session.success = 'Class updated successfully';
+    } else {
+      // Handle case where update might fail or return false (e.g., class not found)
+      req.session.error = 'Failed to update class. Class not found or no changes made.';
+    }
+    res.redirect('/admin/classes');
+
+  } catch (error) {
+    console.error('Error updating class:', error);
+    req.session.error = error.message || 'Failed to update class';
+    // Redirect back, potentially with error info
+    res.redirect('/admin/classes');
+  }
+});
+
 // --- NEW: API endpoint to get class details for view modal ---
 /**
  * Get class details (for modal) - Admin only
