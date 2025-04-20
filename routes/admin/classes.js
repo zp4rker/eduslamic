@@ -88,6 +88,81 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the edit class page - Admin only
+ * GET /classes/edit/:id
+ */
+router.get('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const classId = req.params.id;
+    const classObj = await Class.findById(classId);
+
+    if (!classObj) {
+      req.session.error = 'Class not found.';
+      return res.redirect('/admin/classes');
+    }
+
+    const teachers = await User.findByRole(ROLES.TEACHER);
+    const error = req.session.error; // Get potential error from previous attempt
+    const values = req.session.values; // Get potential values from previous attempt
+    req.session.error = null; // Clear session error
+    req.session.values = null; // Clear session values
+
+    res.render('admin/classes/edit', {
+      user: req.session.user,
+      classObj,
+      teachers,
+      error,
+      values: values || {} // Pass values or empty object
+    });
+  } catch (error) {
+    console.error('Error fetching class for edit:', error);
+    req.session.error = 'Failed to load class for editing.';
+    res.redirect('/admin/classes');
+  }
+});
+
+/**
+ * Update class details - Admin only
+ * POST /classes/edit/:id
+ */
+router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  const classId = req.params.id;
+  const { name, description, teacherId } = req.body;
+  try {
+    // Basic validation
+    if (!name) {
+      req.session.error = 'Class name is required.';
+      req.session.values = req.body; // Store submitted values in session
+      return res.redirect(`/admin/classes/edit/${classId}`); // Redirect back to edit page
+    }
+
+    // Prepare update data
+    const updateData = {
+      name,
+      description: description || '',
+      teacherId: teacherId || null
+    };
+
+    const updated = await Class.update(classId, updateData);
+
+    if (updated) {
+      req.session.success = 'Class updated successfully';
+      res.redirect('/admin/classes'); // Redirect to index on success
+    } else {
+      req.session.error = 'Failed to update class. Class not found or no changes made.';
+      req.session.values = req.body; // Store submitted values in session
+      res.redirect(`/admin/classes/edit/${classId}`); // Redirect back to edit page
+    }
+
+  } catch (error) {
+    console.error('Error updating class:', error);
+    req.session.error = error.message || 'Failed to update class';
+    req.session.values = req.body; // Store submitted values in session
+    res.redirect(`/admin/classes/edit/${classId}`); // Redirect back to edit page on error
+  }
+});
+
+/**
  * Delete class - Admin only
  * POST /classes/delete/:id
  */
@@ -101,51 +176,6 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error deleting class:', error);
     req.session.error = error.message || 'Failed to delete class';
-    res.redirect('/admin/classes');
-  }
-});
-
-/**
- * Update class details - Admin only
- * POST /classes/edit/:id
- */
-router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
-  try {
-    const classId = req.params.id;
-    const { name, description, teacherId } = req.body;
-
-    // Basic validation
-    if (!name) {
-      req.session.error = 'Class name is required.';
-      // Note: We don't have req.session.values persistence for modals easily here.
-      // Consider client-side validation or more complex state management if needed.
-      // --- UPDATED: Redirect without query param, using session for error ---
-      return res.redirect('/admin/classes');
-    }
-
-    // Prepare update data
-    const updateData = {
-      name,
-      description: description || '',
-      teacherId: teacherId || null
-    };
-
-    // Update the class (Assuming Class.update method exists)
-    // You might need to implement Class.update(id, data) in models/Class.js
-    const updated = await Class.update(classId, updateData);
-
-    if (updated) {
-      req.session.success = 'Class updated successfully';
-    } else {
-      // Handle case where update might fail or return false (e.g., class not found)
-      req.session.error = 'Failed to update class. Class not found or no changes made.';
-    }
-    res.redirect('/admin/classes');
-
-  } catch (error) {
-    console.error('Error updating class:', error);
-    req.session.error = error.message || 'Failed to update class';
-    // Redirect back, potentially with error info
     res.redirect('/admin/classes');
   }
 });

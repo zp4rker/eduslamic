@@ -56,16 +56,12 @@
                                                 title="Manage Students">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                                             </button>
-                                            <button
-                                                type="button"
-                                                class="edit-class-button p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
-                                                data-id="<%= classObj._id %>"
-                                                data-name="<%= classObj.name %>"
-                                                data-description="<%= classObj.description || '' %>"
-                                                data-teacher-id="<%= classObj.teacherId || '' %>"
+                                            <a 
+                                                href="/admin/classes/edit/<%= classObj._id %>" 
+                                                class="p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
                                                 title="Edit Class">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                            </button>
+                                            </a>
                                             <button 
                                                 type="button" 
                                                 class="delete-class-button p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out"
@@ -102,10 +98,9 @@
 
     <!-- Include modals -->
     <%- include('./add-class-modal') %>
-    <%- include('./edit-class-modal') %>
-    <%- include('./view-class-modal') %>  <!-- Added View Modal -->
-    <%- include('./manage-students-modal') %> <!-- Added Manage Students Modal -->
-    <%- include('./delete-class-modal') %> <%# Added delete modal %>
+    <%- include('./view-class-modal') %>
+    <%- include('./manage-students-modal') %>
+    <%- include('./delete-class-modal') %>
 </div>
 
 <script>
@@ -119,8 +114,8 @@
         if(typeof showAddClassModal === 'function') showAddClassModal();
     });
 
-    // --- Edit Class Modal --- 
-    // Assuming showEditClassModal is defined in edit-class-modal.ejs or globally
+    // --- Edit Class Modal --- (Removed - Handled by separate page now)
+    /*
     document.querySelectorAll('.edit-class-button').forEach(button => {
         button.addEventListener('click', function() {
             const classId = this.dataset.id;
@@ -132,6 +127,7 @@
             }
         });
     });
+    */
 
     // --- View Class Modal --- 
     // Assuming openViewModal is defined in view-class-modal.ejs
