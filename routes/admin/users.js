@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User, ROLES } = require('../../models/User'); // Corrected path
+const { User, ROLES, db } = require('../../models/User'); // Corrected path, added db import
 const { isAuthenticated, isAdmin } = require('../../middleware/auth'); // Corrected path
 const bcrypt = require('bcryptjs');
 
@@ -182,7 +182,7 @@ router.post('/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
     }
     
     // Delete the user
-    await User.db.remove(user);
+    await db.remove(user); // Use the imported db object directly
 
     req.session.success = 'User deleted successfully';
     res.redirect('/admin/users'); // Updated path
