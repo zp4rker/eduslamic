@@ -1,6 +1,6 @@
 <% var success = typeof success !== 'undefined' ? success : null; %>
 <% var error = typeof error !== 'undefined' ? error : null; %>
-<% var values = typeof values !== 'undefined' ? values : (userToEdit || {}); %> <%# Use userToEdit if values not passed (e.g., on initial load) %>
+<% var values = typeof values !== 'undefined' ? values : {}; %> <%# Use passed values on error, otherwise empty %>
 <% var allRoles = typeof allRoles !== 'undefined' ? allRoles : []; %>
 
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -9,7 +9,7 @@
     <!-- Page Header -->
     <div class="px-4 py-6 sm:px-0 mb-8">
         <h1 class="text-3xl font-bold leading-tight text-gray-900">
-            Edit User: <%= userToEdit.name %>
+            Add New User
         </h1>
     </div>
 
@@ -19,47 +19,47 @@
             <h2 class="text-xl font-semibold text-gray-800">User Details</h2>
         </div>
         <div class="px-6 py-6">
-            <form id="edit-user-form" action="/admin/users/edit/<%= userToEdit._id %>" method="POST">
+            <form id="add-user-form" action="/admin/users/create" method="POST">
                 <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>"> <%# Optional CSRF token %>
 
                 <!-- Name -->
                 <div class="mb-4">
-                    <label for="edit-user-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                    <input type="text" id="edit-user-name" name="name" required 
-                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" 
+                    <label for="add-user-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <input type="text" id="add-user-name" name="name" required
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                            value="<%= values.name || '' %>">
                 </div>
 
                 <!-- Email -->
                 <div class="mb-4">
-                    <label for="edit-user-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="edit-user-email" name="email" required 
-                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" 
+                    <label for="add-user-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="add-user-email" name="email" required
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                            value="<%= values.email || '' %>">
                 </div>
 
                 <!-- Phone -->
                 <div class="mb-4">
-                    <label for="edit-user-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
-                    <input type="tel" id="edit-user-phone" name="phone" 
-                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" 
+                    <label for="add-user-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
+                    <input type="tel" id="add-user-phone" name="phone"
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                            value="<%= values.phone || '' %>">
                 </div>
 
                 <!-- Roles -->
-                <div class="mb-6">
+                <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
                     <div class="space-y-2">
-                        <% 
-                        const currentRoles = values.roles || []; // Get current roles from values or userToEdit
-                        allRoles.forEach(role => { 
+                        <%
+                        const currentRoles = values.roles || []; // Get current roles from values
+                        allRoles.forEach(role => {
                             const isChecked = currentRoles.includes(role);
                         %>
                             <div class="flex items-center">
-                                <input id="edit-role-<%= role %>" name="roles" type="checkbox" value="<%= role %>" 
+                                <input id="add-role-<%= role %>" name="roles" type="checkbox" value="<%= role %>"
                                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                        <%= isChecked ? 'checked' : '' %>>
-                                <label for="edit-role-<%= role %>" class="ml-3 block text-sm text-gray-900">
+                                <label for="add-role-<%= role %>" class="ml-3 block text-sm text-gray-900">
                                     <%= role.charAt(0).toUpperCase() + role.slice(1) %>
                                 </label>
                             </div>
@@ -68,13 +68,29 @@
                     <p class="text-xs text-gray-500 mt-1">Select at least one role.</p>
                 </div>
 
+                <!-- Password -->
+                <div class="mb-4">
+                    <label for="add-user-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="add-user-password" name="password" required minlength="6"
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                    <p class="text-xs text-gray-500 mt-1">Must be at least 6 characters long.</p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-6">
+                    <label for="add-user-confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <input type="password" id="add-user-confirmPassword" name="confirmPassword" required minlength="6"
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+
+
                 <!-- Action Buttons -->
                 <div class="pt-4 flex justify-end space-x-3">
                      <a href="/admin/users" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
                         Cancel
                     </a>
                     <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                        Update User
+                        Create User
                     </button>
                 </div>
             </form>

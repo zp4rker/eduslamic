@@ -42,6 +42,27 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the add user page - Admin only
+ * GET /users/add
+ */
+router.get('/add', isAuthenticated, isAdmin, (req, res) => {
+  // Retrieve and clear potential error/values from session (e.g., from failed POST)
+  const error = req.session.error;
+  const values = req.session.values;
+  req.session.error = null;
+  req.session.values = null;
+
+  res.render('admin/users/add', { // Render the new add page
+    title: 'Add New User',
+    user: req.session.user,
+    allRoles: Object.values(ROLES), // Pass all available roles
+    error: error, // Pass error from session if exists
+    values: values || {}, // Pass values from session or empty object
+    // csrfToken: req.csrfToken() // Optional: Add CSRF token if using csurf
+  });
+});
+
+/**
  * Create new user - Admin only
  * POST /users/create
  */
@@ -54,34 +75,39 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     if (rolesArray.length === 0) {
       req.session.error = 'At least one role must be selected';
       req.session.values = { name, email, phone, roles: rolesArray }; // Pass back the (potentially empty) array
-      return res.redirect('/admin/users');
+      // Redirect back to the add page on error
+      return res.redirect('/admin/users/add');
     }
 
     // Validate passwords match
     if (password !== confirmPassword) {
       req.session.error = 'Passwords do not match';
       req.session.values = { name, email, phone, roles: rolesArray };
-      return res.redirect('/admin/users'); // Updated path
+      // Redirect back to the add page on error
+      return res.redirect('/admin/users/add');
     }
 
     // Validate password length
     if (password.length < 6) {
       req.session.error = 'Password must be at least 6 characters';
       req.session.values = { name, email, phone, roles: rolesArray };
-      return res.redirect('/admin/users'); // Updated path
+      // Redirect back to the add page on error
+      return res.redirect('/admin/users/add');
     }
 
     // Create user with roles array
     await User.create({ name, email, phone, roles: rolesArray, password });
 
     req.session.success = 'User created successfully';
+    // Redirect to the user list on success
     res.redirect('/admin/users');
   } catch (error) {
     console.error('Error creating user:', error);
     req.session.error = error.message || 'Failed to create user';
     // Ensure roles is passed back correctly even on error
     req.session.values = { ...req.body, roles: Array.isArray(req.body.roles) ? req.body.roles : (req.body.roles ? [req.body.roles] : []) };
-    res.redirect('/admin/users');
+    // Redirect back to the add page on error
+    res.redirect('/admin/users/add');
   }
 });
 
