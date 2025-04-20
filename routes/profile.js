@@ -12,11 +12,15 @@ router.get('/', isAuthenticated, (req, res) => {
   const successMessage = req.session.success;
   delete req.session.success;
 
+  // Retrieve error message from session and clear it
+  const errorMessage = req.session.error;
+  delete req.session.error;
+
   res.render('profile', {
     user: req.session.user,
     roles: ROLES,
     success: successMessage, // Pass session success message
-    error: req.query.error // Keep error handling via query params
+    error: errorMessage // Pass session error message
   });
 });
 
@@ -36,10 +40,11 @@ router.post('/update', isAuthenticated, async (req, res) => {
     req.session.user = updatedUser;
     
     req.session.success = 'Profile updated successfully';
-    res.redirect('/profile'); // Changed redirect from /profile/edit
+    res.redirect('/profile');
   } catch (error) {
     console.error('Profile update error:', error);
-    res.redirect(`/profile?error=${encodeURIComponent(error.message)}`); // Changed redirect from /profile/edit
+    req.session.error = error.message; // Store error in session
+    res.redirect('/profile'); // Redirect without query param
   }
 });
 
@@ -54,22 +59,25 @@ router.post('/password', isAuthenticated, async (req, res) => {
     
     // Validate new password
     if (!newPassword || newPassword.length < 6) {
-      return res.redirect('/profile?error=New password must be at least 6 characters'); // Changed redirect from /profile/edit
+      req.session.error = 'New password must be at least 6 characters'; // Store error in session
+      return res.redirect('/profile'); // Redirect without query param
     }
     
     // Check if passwords match
     if (newPassword !== confirmPassword) {
-      return res.redirect('/profile?error=New passwords do not match'); // Changed redirect from /profile/edit
+      req.session.error = 'New passwords do not match'; // Store error in session
+      return res.redirect('/profile'); // Redirect without query param
     }
     
     // Update password
     await User.updatePassword(userId, currentPassword, newPassword);
     
     req.session.success = 'Password updated successfully';
-    res.redirect('/profile'); // Changed redirect from /profile/edit
+    res.redirect('/profile');
   } catch (error) {
     console.error('Password update error:', error);
-    res.redirect(`/profile?error=${encodeURIComponent(error.message)}`); // Changed redirect from /profile/edit
+    req.session.error = error.message; // Store error in session
+    res.redirect('/profile'); // Redirect without query param
   }
 });
 
@@ -99,7 +107,8 @@ router.post('/role/:userId', isAuthenticated, isAdmin, async (req, res) => {
     res.redirect('/');
   } catch (error) {
     console.error('Role update error:', error);
-    res.redirect(`/?error=${encodeURIComponent(error.message)}`);
+    req.session.error = error.message; // Store error in session
+    res.redirect('/'); // Redirect without query param
   }
 });
 

@@ -119,7 +119,8 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
       req.session.error = 'Class name is required.';
       // Note: We don't have req.session.values persistence for modals easily here.
       // Consider client-side validation or more complex state management if needed.
-      return res.redirect('/admin/classes?error=Class name required'); // Redirect with query param
+      // --- UPDATED: Redirect without query param, using session for error ---
+      return res.redirect('/admin/classes');
     }
 
     // Prepare update data
