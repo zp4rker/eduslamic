@@ -2,7 +2,7 @@ const PouchDB = require('pouchdb');
 const { v4: uuidv4 } = require('uuid');
 PouchDB.plugin(require('pouchdb-find'));
 
-const db = new PouchDB('student_classes');
+const db = new PouchDB('student_classes', { prefix: './db/' });
 
 /**
  * StudentClass model for managing relationships between students and classes

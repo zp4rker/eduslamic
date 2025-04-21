@@ -6,7 +6,7 @@ const User = require('./User').User;
 const Class = require('./Class');
 PouchDB.plugin(require('pouchdb-find'));
 
-const db = new PouchDB('students');
+const db = new PouchDB('students', { prefix: './db/' });
 
 /**
  * Student model representing a student in the education system

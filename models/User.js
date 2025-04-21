@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 PouchDB.plugin(require('pouchdb-find'));
 
-const db = new PouchDB('users');
+const db = new PouchDB('users', { prefix: './db/' });
 
 // Define valid roles
 const ROLES = {
