@@ -85,6 +85,46 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the edit student form
+ * GET /students/edit/:id
+ */
+router.get('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const student = await Student.findById(studentId);
+    const parents = await User.findByRole(ROLES.PARENT);
+    const assignedParentIds = await StudentParent.findParentsByStudent(studentId);
+
+    if (!student) {
+      req.session.error = 'Student not found.';
+      return res.redirect('/admin/students');
+    }
+
+    // Retrieve and clear success/error messages and values from session if redirected back
+    const success = req.session.success;
+    const error = req.session.error;
+    const values = req.session.values || {}; // Get submitted values if redirected on error
+    req.session.success = null;
+    req.session.error = null;
+    req.session.values = null;
+
+    res.render('admin/students/edit', {
+      user: req.session.user,
+      student,
+      parents,
+      assignedParentIds: assignedParentIds.map(id => id.toString()), // Ensure IDs are strings for comparison in EJS
+      success,
+      error,
+      values // Pass potentially repopulated values to the view
+    });
+  } catch (error) {
+    console.error('Error fetching student for edit:', error);
+    req.session.error = 'Failed to load student data for editing.';
+    res.redirect('/admin/students');
+  }
+});
+
+/**
  * Update student - Admin only
  * POST /students/edit/:id
  */
@@ -97,8 +137,8 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
     if (!name || !dateOfBirth) {
       req.session.error = 'Student name and date of birth are required.';
       req.session.values = req.body; // Pass back submitted values
-      // Redirect back to the student list, the modal might need to be reopened manually or state managed client-side
-      return res.redirect('/admin/students'); 
+      // Redirect back to the edit page for this student
+      return res.redirect(`/admin/students/edit/${studentId}`);
     }
 
     // Update the student's core details using the correct method name
@@ -123,12 +163,13 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
     }
 
     req.session.success = 'Student updated successfully';
-    res.redirect('/admin/students');
+    res.redirect('/admin/students'); // Redirect to the list page on success
   } catch (error) {
     console.error('Error updating student:', error);
     req.session.error = error.message || 'Failed to update student';
     req.session.values = req.body; // Pass back submitted values on error
-    res.redirect('/admin/students');
+    // Redirect back to the edit page for this student on error
+    res.redirect(`/admin/students/edit/${req.params.id}`);
   }
 });
 

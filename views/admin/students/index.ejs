@@ -49,15 +49,13 @@
                                                 title="View Student">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                             </button>
-                                            <button 
-                                                type="button" 
-                                                class="edit-student-button p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
-                                                data-id="<%= student._id %>"
-                                                data-name="<%= student.name %>"
-                                                data-dob="<%= student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().split('T')[0] : '' %>"
+                                            <!-- Changed Edit button to a link -->
+                                            <a 
+                                                href="/admin/students/edit/<%= student._id %>"
+                                                class="p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
                                                 title="Edit Student">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                            </button>
+                                            </a>
                                             <button 
                                                 type="button" 
                                                 class="delete-student-button p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out"
@@ -94,7 +92,6 @@
 
     <!-- Include modals -->
     <%- include('./add-student-modal') %>
-    <%- include('./edit-student-modal') %>
     <%- include('./view-student-modal') %>
     <%- include('./delete-student-modal') %>
 </div>
@@ -113,19 +110,7 @@
             }
         });
 
-        // Edit Student Modal Trigger
-        const editButtons = document.querySelectorAll('.edit-student-button');
-        editButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const studentId = this.getAttribute('data-id');
-                const studentName = this.getAttribute('data-name');
-                const dob = this.getAttribute('data-dob');
-
-                if (typeof window.showEditStudentModal === 'function') {
-                    window.showEditStudentModal(studentId, studentName, dob);
-                }
-            });
-        });
+        // Removed Edit Student Modal Trigger logic
 
         // View Student Modal Trigger
         const viewButtons = document.querySelectorAll('.view-student-button');
