@@ -48,18 +48,9 @@
 
             <div>
                 <label for="parentIds" class="block text-sm font-medium text-gray-700">Assign Parent(s)</label>
-                <select multiple id="parentIds" name="parentIds" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm h-32">
-                    <% if (parents.length > 0) { %>
-                        <% parents.forEach(parent => { %>
-                            <option value="<%= parent._id %>" <%= assignedParentIds.includes(parent._id.toString()) ? 'selected' : '' %>>
-                                <%= parent.name %> (<%= parent.email %>)
-                            </option>
-                        <% }); %>
-                    <% } else { %>
-                        <option disabled>No parents available</option>
-                    <% } %>
-                </select>
-                <p class="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple parents.</p>
+                <!-- Removed Tailwind classes like border, shadow, focus rings as Tagify container handles styling -->
+                <input id="parentIds" name="parentIds" value="" class="mt-1 block w-full">
+                <p class="text-sm text-gray-500 mt-1">Type to search and select parents.</p>
             </div>
 
             <div class="pt-2 flex justify-end space-x-3">
@@ -73,3 +64,53 @@
         </form>
     </div>
 </div>
+
+<!-- Add Tagify CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+
+<script>
+    // Prepare data for Tagify
+    const parentsData = <%- JSON.stringify(parents.map(p => ({ value: p._id.toString(), name: `${p.name} (${p.email})` }))) %>;
+    const assignedParentIdsData = <%- JSON.stringify(assignedParentIds) %>;
+
+    // Find the full parent objects for the initially assigned IDs
+    const initialTags = assignedParentIdsData
+        .map(id => parentsData.find(p => p.value === id))
+        .filter(p => p); // Filter out any potential nulls if an ID doesn't match
+
+    // Get the input element
+    const input = document.getElementById('parentIds');
+
+    // Initialize Tagify
+    const tagify = new Tagify(input, {
+        tagTextProp: 'name', // <-- Add this line to display the 'name' property
+        whitelist: parentsData, // List of allowed tags
+        originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','), // Submit comma-separated IDs
+        dropdown: {
+            mapValueTo: 'name', // <-- Add this to display 'name' in suggestions
+            maxItems: 10,           // Max items shown in dropdown
+            classname: "tags-look", // Optional: Classname for dropdown
+            enabled: 0,             // Start without showing dropdown
+            closeOnSelect: false    // Keep dropdown open after selection
+        },
+        enforceWhitelist: true // Only allow tags from the whitelist
+    });
+
+    // Set initial value
+    tagify.addTags(initialTags);
+
+    // Optional: Add event listener if needed for debugging or complex logic
+    // tagify.on('change', function(e){
+    //     console.log('Tagify changed:', e.detail.value);
+    //     // The input's value is automatically updated by Tagify based on originalInputValueFormat
+    // });
+
+    // Ensure the input value is correctly set on form submission
+    // Tagify handles updating the original input's value based on the 'originalInputValueFormat' setting.
+    // If submitting as JSON was preferred, the format would be:
+    // originalInputValueFormat: valuesArr => JSON.stringify(valuesArr.map(item => item.value))
+    // And the server-side would need to parse JSON.
+    // Using comma-separated is often simpler if the server expects a string or can easily split it.
+
+</script>

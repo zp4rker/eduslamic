@@ -160,7 +160,8 @@ router.get('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
 router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const studentId = req.params.id;
-    const { name, dateOfBirth, parentIds } = req.body;
+    // Get parentIds as a string from Tagify, default to empty string if not provided
+    const { name, dateOfBirth, parentIds: parentIdsString = '' } = req.body;
 
     // Basic validation
     if (!name || !dateOfBirth) {
@@ -175,10 +176,14 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
 
     // Update parent associations
     const currentParentIds = await StudentParent.findParentsByStudent(studentId);
-    const newParentIds = parentIds ? (Array.isArray(parentIds) ? parentIds : [parentIds]) : [];
+    // Split the comma-separated string into an array, filter out empty strings
+    const newParentIds = parentIdsString ? parentIdsString.split(',').filter(id => id) : [];
+
+    // Convert currentParentIds to strings for comparison if they aren't already
+    const currentParentIdsStr = currentParentIds.map(id => id.toString());
 
     // Remove parents that were unselected
-    for (const currentId of currentParentIds) {
+    for (const currentId of currentParentIdsStr) {
       if (!newParentIds.includes(currentId)) {
         await Student.removeParent(studentId, currentId);
       }
@@ -186,7 +191,8 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
 
     // Add newly selected parents
     for (const newId of newParentIds) {
-      if (!currentParentIds.includes(newId)) {
+      // Ensure we don't try to add parents that are already assigned
+      if (!currentParentIdsStr.includes(newId)) {
         await Student.addParent(studentId, newId);
       }
     }

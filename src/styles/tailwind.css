@@ -1,3 +1,75 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Tagify Styles */
+@layer components {
+  .tagify {
+    @apply !border-gray-300 rounded-md shadow-sm bg-white w-full;
+    /* Adjust padding as needed, !important might be necessary to override defaults */
+    --tags-border-color: theme('colors.gray.300');
+    --tag-bg: theme('colors.indigo.100');
+    --tag-text-color: theme('colors.indigo.700');
+    --tag-pad: theme('padding.1') theme('padding.2');
+    --tag-border-radius: theme('borderRadius.md');
+    --tag-text-color--edit: theme('colors.indigo.700');
+    --tag-remove-btn-color: theme('colors.indigo.400');
+    min-height: 2.625rem; /* Match height of other inputs (py-2 + border) */
+    padding-top: 0.3rem; /* Adjust vertical alignment */
+    padding-bottom: 0.3rem; /* Adjust vertical alignment */
+  }
+
+  .tagify:hover {
+    --tags-border-color: theme('colors.gray.400');
+  }
+
+  .tagify.tagify--focus {
+    --tags-border-color: theme('colors.indigo.500');
+    box-shadow: 0 0 0 1px theme('colors.indigo.500'); /* Mimic focus:ring-1 */
+  }
+
+  .tagify__tag {
+    @apply m-0.5;
+  }
+
+  .tagify__tag > div {
+    @apply p-0;
+  }
+
+  .tagify__tag > div::before {
+    /* Hide the default ::before content if not needed */
+    content: none;
+  }
+
+  .tagify__tag span.tagify__tag-text {
+    /* Ensure text color is applied */
+    color: var(--tag-text-color);
+  }
+
+  .tagify__input {
+    @apply m-0.5 p-0;
+    /* Ensure input blends in */
+    min-width: 100px;
+  }
+
+  .tagify__tag__removeBtn {
+    @apply order-last ml-1.5 mr-0;
+  }
+
+  /* Style the dropdown to match */
+  .tagify__dropdown {
+    @apply rounded-md border border-gray-300 shadow-lg bg-white;
+  }
+  .tagify__dropdown__item {
+    @apply px-3 py-2 hover:bg-indigo-100 hover:text-indigo-700;
+  }
+  .tagify__dropdown__item--active {
+    @apply bg-indigo-600 text-white;
+  }
+}
+
+/* Ensure body takes full height if needed for layout */
+/* html, body { height: 100%; } */
+/* body { display: flex; flex-direction: column; } */
+/* main { flex: 1 0 auto; } */
+/* footer { flex-shrink: 0; } */
