@@ -14,13 +14,13 @@
     <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
         <div class="px-6 py-5 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-800">All Students</h2>
-            <!-- Add New Student Button -->
-            <button id="add-student-button" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+            <!-- Changed Add New Student Button to a link -->
+            <a href="/admin/students/add" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
                 Add New Student
-            </button>
+            </a>
         </div>
         <div class="px-6 py-6">
             <% if (students && students.length > 0) { %>
@@ -49,7 +49,6 @@
                                                 title="View Student">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                             </button>
-                                            <!-- Changed Edit button to a link -->
                                             <a 
                                                 href="/admin/students/edit/<%= student._id %>"
                                                 class="p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
@@ -78,39 +77,27 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900">No students</h3>
                     <p class="mt-1 text-sm text-gray-500">Get started by creating a new student.</p>
                     <div class="mt-6">
-                      <button id="add-student-button-empty" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      <!-- Changed Add New Student Button to a link -->
+                      <a href="/admin/students/add" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                         </svg>
                         Add New Student
-                      </button>
+                      </a>
                     </div>
                   </div>
             <% } %>
         </div>
     </div>
 
-    <!-- Include modals -->
-    <%- include('./add-student-modal') %>
+    <!-- Include modals (Removed add-student-modal) -->
     <%- include('./view-student-modal') %>
     <%- include('./delete-student-modal') %>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Add Student Modal Trigger
-        document.getElementById('add-student-button')?.addEventListener('click', () => {
-            if (typeof window.showAddStudentModal === 'function') {
-                window.showAddStudentModal();
-            }
-        });
-        document.getElementById('add-student-button-empty')?.addEventListener('click', () => {
-            if (typeof window.showAddStudentModal === 'function') {
-                window.showAddStudentModal();
-            }
-        });
-
-        // Removed Edit Student Modal Trigger logic
+        // Removed Add Student Modal Trigger logic
 
         // View Student Modal Trigger
         const viewButtons = document.querySelectorAll('.view-student-button');

@@ -49,6 +49,33 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the add student form
+ * GET /students/add
+ */
+router.get('/add', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const parents = await User.findByRole(ROLES.PARENT);
+
+    // Retrieve and clear potential error messages and values from session if redirected back
+    const error = req.session.error;
+    const values = req.session.values || {}; // Get submitted values if redirected on error
+    req.session.error = null;
+    req.session.values = null;
+
+    res.render('admin/students/add', {
+      user: req.session.user,
+      parents,
+      error,
+      values // Pass potentially repopulated values to the view
+    });
+  } catch (error) {
+    console.error('Error fetching data for add student page:', error);
+    req.session.error = 'Failed to load the add student form.';
+    res.redirect('/admin/students');
+  }
+});
+
+/**
  * Create new student - Admin only
  * POST /students/create
  */
@@ -60,7 +87,8 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     if (!name || !dateOfBirth) {
       req.session.error = 'Student name and date of birth are required.';
       req.session.values = req.body; // Pass back submitted values
-      return res.redirect('/admin/students');
+      // Redirect back to the add page
+      return res.redirect('/admin/students/add');
     }
 
     // Create the student
@@ -80,7 +108,8 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     console.error('Error creating student:', error);
     req.session.error = error.message || 'Failed to create student';
     req.session.values = req.body; // Pass back submitted values on error
-    res.redirect('/admin/students');
+    // Redirect back to the add page on error
+    res.redirect('/admin/students/add');
   }
 });
 
