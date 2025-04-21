@@ -14,13 +14,13 @@
     <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
         <div class="px-6 py-5 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-800">All Classes</h2>
-            <!-- Add New Class Button -->
-            <button id="add-class-button" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+            <!-- UPDATED: Add New Class Button changed to Link -->
+            <a href="/admin/classes/add" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
                 Add New Class
-            </button>
+            </a>
         </div>
         <div class="px-6 py-6">
             <% if (classes && classes.length > 0) { %>
@@ -84,50 +84,27 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900">No classes</h3>
                     <p class="mt-1 text-sm text-gray-500">Get started by creating a new class.</p>
                     <div class="mt-6">
-                      <button id="add-class-button-empty" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      <!-- UPDATED: Add New Class Button changed to Link -->
+                      <a href="/admin/classes/add" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                         </svg>
                         Add New Class
-                      </button>
+                      </a>
                     </div>
                   </div>
             <% } %>
         </div>
     </div>
 
-    <!-- Include modals -->
-    <%- include('./add-class-modal') %>
+    <!-- REMOVED: Include add-class-modal -->
     <%- include('./view-class-modal') %>
     <%- include('./manage-students-modal') %>
     <%- include('./delete-class-modal') %>
 </div>
 
 <script>
-    // --- Add Class Modal --- 
-    // Ensure both add buttons trigger the modal
-    document.getElementById('add-class-button')?.addEventListener('click', () => {
-        // Assuming showAddClassModal is defined in add-class-modal.ejs or globally
-        if(typeof showAddClassModal === 'function') showAddClassModal(); 
-    });
-    document.getElementById('add-class-button-empty')?.addEventListener('click', () => {
-        if(typeof showAddClassModal === 'function') showAddClassModal();
-    });
-
-    // --- Edit Class Modal --- (Removed - Handled by separate page now)
-    /*
-    document.querySelectorAll('.edit-class-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const classId = this.dataset.id;
-            const className = this.dataset.name;
-            const classDescription = this.dataset.description;
-            const teacherId = this.dataset.teacherId;
-            if(typeof showEditClassModal === 'function') {
-                showEditClassModal(classId, className, classDescription, teacherId);
-            }
-        });
-    });
-    */
+    // --- REMOVED: Add Class Modal --- 
 
     // --- View Class Modal --- 
     // Assuming openViewModal is defined in view-class-modal.ejs

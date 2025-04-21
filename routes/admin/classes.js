@@ -56,6 +56,31 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the add class page - Admin only
+ * GET /classes/add
+ */
+router.get('/add', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const teachers = await User.findByRole(ROLES.TEACHER);
+    const error = req.session.error;
+    const values = req.session.values;
+    req.session.error = null;
+    req.session.values = null;
+
+    res.render('admin/classes/add', {
+      user: req.session.user,
+      teachers,
+      error,
+      values: values || {}
+    });
+  } catch (error) {
+    console.error('Error fetching data for add class page:', error);
+    req.session.error = 'Failed to load page data.';
+    res.redirect('/admin/classes');
+  }
+});
+
+/**
  * Create new class - Admin only
  * POST /classes/create
  */
@@ -67,7 +92,8 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     if (!name) {
       req.session.error = 'Class name is required.';
       req.session.values = req.body; // Pass back submitted values
-      return res.redirect('/admin/classes');
+      // Redirect back to add page on validation error
+      return res.redirect('/admin/classes/add');
     }
 
     // Create the class
@@ -83,7 +109,8 @@ router.post('/create', isAuthenticated, isAdmin, async (req, res) => {
     console.error('Error creating class:', error);
     req.session.error = error.message || 'Failed to create class';
     req.session.values = req.body; // Pass back submitted values on error
-    res.redirect('/admin/classes');
+    // Redirect back to add page on creation error
+    res.redirect('/admin/classes/add');
   }
 });
 
@@ -269,11 +296,11 @@ router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
     }
 
     req.session.success = 'Students updated successfully';
-    // --- UPDATED: Redirect back to the main classes list ---
+    // Redirect back to the main classes list
     res.redirect(`/admin/classes`);
   } catch (error) {
     console.error('Error updating students in class:', error);
-    // --- UPDATED: Redirect back to the main classes list with error ---
+    // Redirect back to the main classes list with error
     req.session.error = error.message || 'Failed to update students';
     res.redirect(`/admin/classes`);
   }
