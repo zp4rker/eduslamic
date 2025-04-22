@@ -4,6 +4,7 @@ const Student = require('../../models/Student');
 const { User, ROLES } = require('../../models/User');
 const StudentParent = require('../../models/StudentParent');
 const { isAuthenticated, isAdmin } = require('../../middleware/auth');
+const StudentClass = require('../../models/StudentClass');
 
 router.get('/', isAuthenticated, isAdmin, async (req, res) => {
   try {
@@ -220,6 +221,41 @@ router.get('/api/details/:id', isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error fetching student details for API:', error);
     res.status(500).json({ error: error.message || 'Failed to load student details' });
+  }
+});
+
+router.get('/api/search', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const query = req.query.q || '';
+    const excludeClassId = req.query.excludeClassId;
+
+    if (!excludeClassId) {
+      return res.status(400).json({ error: 'excludeClassId parameter is required' });
+    }
+
+    // 1. Find all students matching the query (case-insensitive)
+    const allStudents = await Student.findAll();
+    const matchingStudents = allStudents.filter(student => 
+      student.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // 2. Find students already enrolled in the specified class
+    const enrolledStudentIds = await StudentClass.findStudentsByClass(excludeClassId);
+    const enrolledStudentIdSet = new Set(enrolledStudentIds);
+
+    // 3. Filter out already enrolled students
+    const availableStudents = matchingStudents.filter(student => 
+      !enrolledStudentIdSet.has(student._id)
+    );
+
+    // 4. Return only necessary fields (id and name)
+    const result = availableStudents.map(student => ({ _id: student._id, name: student.name }));
+
+    res.json(result);
+
+  } catch (error) {
+    console.error('Error searching students for API:', error);
+    res.status(500).json({ error: error.message || 'Failed to search students' });
   }
 });
 

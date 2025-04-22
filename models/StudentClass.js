@@ -4,6 +4,17 @@ PouchDB.plugin(require('pouchdb-find'));
 
 const db = new PouchDB('student_classes', { prefix: './db/' });
 
+// Ensure indexes are created on startup
+db.createIndex({
+  index: { fields: ['studentId', 'classId'] }
+}).then(() => {
+  console.log('Index created for studentId, classId in student_classes');
+}).catch(err => {
+  if (err.name !== 'conflict') { // Ignore if index already exists
+      console.error('Error creating studentId, classId index:', err);
+  }
+});
+
 /**
  * StudentClass model for managing relationships between students and classes
  */
@@ -26,7 +37,6 @@ class StudentClass {
         studentId: data.studentId,
         classId: data.classId,
         enrolledAt: data.enrolledAt || new Date().toISOString(),
-        status: data.status || 'active', // active, inactive, completed
         createdAt: new Date().toISOString()
       };
 
@@ -48,13 +58,13 @@ class StudentClass {
     try {
       const result = await db.find({
         selector: { 
-          studentId: studentId,
-          status: 'active'
+          studentId: studentId
         }
       });
       
       return result.docs.map(doc => doc.classId);
     } catch (error) {
+      console.error(`Error in findClassesByStudent for student ${studentId}:`, error);
       throw error;
     }
   }
@@ -68,44 +78,13 @@ class StudentClass {
     try {
       const result = await db.find({
         selector: { 
-          classId: classId,
-          status: 'active'
+          classId: classId
         }
       });
       
       return result.docs.map(doc => doc.studentId);
     } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Update student-class relationship status
-   * @param {string} studentId - Student ID
-   * @param {string} classId - Class ID
-   * @param {string} status - New status (active, inactive, completed)
-   * @returns {Promise<boolean>} - Success status
-   */
-  static async updateStatus(studentId, classId, status) {
-    try {
-      const result = await db.find({
-        selector: {
-          studentId: studentId,
-          classId: classId
-        }
-      });
-      
-      if (result.docs.length === 0) {
-        return false;
-      }
-      
-      const relationship = result.docs[0];
-      relationship.status = status;
-      relationship.updatedAt = new Date().toISOString();
-      
-      await db.put(relationship);
-      return true;
-    } catch (error) {
+      console.error(`Error in findStudentsByClass for class ${classId}:`, error);
       throw error;
     }
   }
@@ -121,35 +100,53 @@ class StudentClass {
       const result = await db.find({
         selector: {
           studentId: studentId,
-          classId: classId,
-          status: 'active'
+          classId: classId
         }
       });
       
       return result.docs.length > 0;
     } catch (error) {
+      console.error(`Error checking enrollment for student ${studentId} in class ${classId}:`, error);
       throw error;
     }
   }
   
   /**
-   * Remove student from class
+   * Remove student from class (delete the enrollment record)
    * @param {string} studentId - Student ID
    * @param {string} classId - Class ID
    * @returns {Promise<boolean>} - Success status
    */
   static async removeFromClass(studentId, classId) {
-    return this.updateStatus(studentId, classId, 'inactive');
-  }
+    try {
+      const result = await db.find({
+        selector: {
+          studentId: studentId,
+          classId: classId
+        }
+      });
 
-  /**
-   * Complete student's class
-   * @param {string} studentId - Student ID
-   * @param {string} classId - Class ID
-   * @returns {Promise<boolean>} - Success status
-   */
-  static async completeClass(studentId, classId) {
-    return this.updateStatus(studentId, classId, 'completed');
+      if (result.docs.length === 0) {
+        return false; // Indicate not found
+      }
+
+      const enrollmentDoc = result.docs[0];
+
+      // Use db.remove with the document object (which includes _id and _rev)
+      const removeResult = await db.remove(enrollmentDoc);
+
+      if (removeResult.ok) {
+        return true;
+      } else {
+        // This case might not be reached if remove throws an error, but included for completeness
+        console.error(`Failed to remove enrollment record ${enrollmentDoc._id}. Result:`, removeResult);
+        return false;
+      }
+
+    } catch (error) {
+      console.error(`Error removing enrollment for student ${studentId} in class ${classId}:`, error);
+      return false; // Indicate failure
+    }
   }
 }
 

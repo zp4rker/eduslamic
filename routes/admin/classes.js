@@ -238,19 +238,29 @@ router.get('/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
       return res.redirect('/admin/classes');
     }
 
-    const allStudents = await Student.findAll();
+    // Fetch IDs of enrolled students
     const enrolledStudentIds = await StudentClass.findStudentsByClass(classId);
+
+    // Fetch full student objects for enrolled students
+    const enrolledStudents = [];
+    for (const studentId of enrolledStudentIds) {
+      const student = await Student.findById(studentId);
+      if (student) {
+        enrolledStudents.push(student);
+      }
+    }
 
     const error = req.session.error;
     req.session.error = null;
+    const success = req.session.success;
+    req.session.success = null;
 
     res.render('admin/classes/manage-students', {
       user: req.session.user,
       classObj,
-      allStudents,
-      enrolledStudentIds,
+      enrolledStudents, // Pass the array of enrolled student objects
       error,
-      success: null
+      success
     });
   } catch (error) {
     console.error('Error fetching data for manage students page:', error);
@@ -260,34 +270,65 @@ router.get('/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
- * Update students in class - Admin only
+ * Enroll a student in a class - Admin only
  * POST /classes/:id/students
  */
 router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
   const classId = req.params.id;
+  const { studentId } = req.body; // Expecting a single studentId from the search form
+
   try {
-    const currentStudentIds = await StudentClass.findStudentsByClass(classId);
-    const { studentIds } = req.body;
-    const newStudentIds = studentIds ? (Array.isArray(studentIds) ? studentIds : [studentIds]) : [];
-
-    for (const currentId of currentStudentIds) {
-      if (!newStudentIds.includes(currentId)) {
-        await Student.removeFromClass(currentId, classId);
-      }
+    if (!studentId) {
+      req.session.error = 'No student selected to enroll.';
+      return res.redirect(`/admin/classes/manage/${classId}`);
     }
 
-    for (const newId of newStudentIds) {
-      if (!currentStudentIds.includes(newId)) {
-        await Student.enrollInClass(newId, classId);
-      }
+    // Check if already enrolled (optional but good practice)
+    const isEnrolled = await StudentClass.isEnrolled(studentId, classId);
+    if (isEnrolled) {
+      req.session.error = 'Student is already enrolled in this class.';
+      return res.redirect(`/admin/classes/manage/${classId}`);
     }
 
-    req.session.success = 'Students updated successfully';
-    res.redirect(`/admin/classes`);
-  } catch (error) {
-    console.error('Error updating students in class:', error);
-    req.session.error = error.message || 'Failed to update students';
+    // Enroll the student
+    await Student.enrollInClass(studentId, classId);
+
+    req.session.success = 'Student enrolled successfully';
     res.redirect(`/admin/classes/manage/${classId}`);
+  } catch (error) {
+    console.error('Error enrolling student in class:', error);
+    req.session.error = error.message || 'Failed to enroll student';
+    res.redirect(`/admin/classes/manage/${classId}`);
+  }
+});
+
+/**
+ * Unenroll a student from a class - Admin only
+ * DELETE /classes/:id/students/:studentId
+ */
+router.delete('/:id/students/:studentId', isAuthenticated, isAdmin, async (req, res) => {
+  const { id: classId, studentId } = req.params;
+  try {
+    // Attempt to remove the enrollment record directly
+    const removed = await StudentClass.removeFromClass(studentId, classId);
+
+    if (removed) {
+      // Set session flash message for success
+      req.session.success = 'Student unenrolled successfully';
+      // Send JSON success response (frontend will handle reload)
+      res.status(200).json({ success: true, message: req.session.success });
+    } else {
+      // Set session flash message for failure (e.g., not found)
+      req.session.error = 'Failed to unenroll student. Enrollment not found.';
+      // Send JSON error response
+      res.status(404).json({ success: false, error: req.session.error });
+    }
+  } catch (error) {
+    console.error('Error unenrolling student:', error);
+    // Set session flash message for server error
+    req.session.error = error.message || 'Failed to unenroll student due to a server error';
+    // Send JSON error response
+    res.status(500).json({ success: false, error: req.session.error });
   }
 });
 
