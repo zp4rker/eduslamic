@@ -5,17 +5,27 @@
     <nav class="flex-1 flex flex-col gap-1 p-4 space-y-1">
         <% if (user) { %>
             <a href="/" class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white transition <%= currentPath === '/' ? 'bg-gray-800 text-white' : '' %>">
-                <i class="fa-solid fa-house mr-3"></i>
+                <!-- Heroicon name: solid/home -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-3">
+                    <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+                    <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75v4.5a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198c.03-.028.061-.056.091-.086L12 5.43z" />
+                </svg>
                 Dashboard
             </a>
             <% if (user.roles && user.roles.includes('admin')) { %>
                 <div>
                     <button id="admin-menu-button" class="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white transition focus:outline-none <%= currentPath.startsWith('/admin') ? 'bg-gray-800 text-white' : '' %>">
                         <span class="flex items-center">
-                            <i class="fa-solid fa-gear mr-3"></i>
+                            <!-- Heroicon name: solid/cog -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-3">
+                                <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.986.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd" />
+                            </svg>
                             Admin
                         </span>
-                        <i id="admin-menu-arrow" class="fa-solid fa-chevron-down w-5 h-5 transform transition-transform duration-200 <%= currentPath.startsWith('/admin') ? 'rotate-180' : '' %>"></i>
+                        <!-- Heroicon name: solid/chevron-down -->
+                        <svg id="admin-menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 transform transition-transform duration-200 <%= currentPath.startsWith('/admin') ? 'rotate-180' : '' %>">
+                            <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 0 1 1.06-1.06L12 14.69l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clip-rule="evenodd" />
+                        </svg>
                     </button>
                     <div id="admin-submenu" class="<%= currentPath.startsWith('/admin') ? '' : 'hidden' %> mt-1 space-y-1 pl-9">
                         <a href="/admin/students" class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white transition <%= currentPath === '/admin/students' ? 'bg-gray-800 text-white' : '' %>">Students</a>
@@ -32,10 +42,16 @@
             <div class="relative" id="profile-menu-container">
                 <button id="profile-menu-button" type="button" class="flex w-full items-center gap-3 rounded-md p-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-600 text-gray-300">
-                        <i class="fa-solid fa-user"></i>
+                        <!-- Heroicon name: solid/user -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                        </svg>
                     </span>
                     <span class="flex-1 text-left truncate"><%= user.name %></span>
-                    <i class="fa-solid fa-chevron-up w-5 h-5 text-gray-400 transform transition-transform duration-200"></i>
+                    <!-- Heroicon name: solid/chevron-up -->
+                    <svg id="profile-menu-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-400 transform transition-transform duration-200">
+                        <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 0 1-1.06-1.06l7.5-7.5Z" clip-rule="evenodd" />
+                    </svg>
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="profile-menu-dropdown" 
@@ -48,11 +64,17 @@
                      data-transition-leave-end="transform opacity-0 scale-95"
                      style="display: none;">
                     <a href="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <%= currentPath === '/profile' ? 'bg-gray-100' : '' %>">
-                        <i class="fa-solid fa-user-circle text-gray-500"></i>
+                        <!-- Heroicon name: outline/user-circle -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
                         Your Profile
                     </a>
                     <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <i class="fa-solid fa-right-from-bracket text-gray-500"></i>
+                        <!-- Heroicon name: outline/arrow-right-on-rectangle -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                        </svg>
                         Logout
                     </a>
                 </div>
@@ -62,7 +84,7 @@
                 document.addEventListener('DOMContentLoaded', function() {
                     const btn = document.getElementById('profile-menu-button');
                     const menu = document.getElementById('profile-menu-dropdown');
-                    const chevron = btn.querySelector('i.fa-chevron-up'); // Get the chevron icon
+                    const chevron = document.getElementById('profile-menu-arrow'); // Updated to target SVG by ID
 
                     if (btn && menu && chevron) {
                         // Function to open the menu
