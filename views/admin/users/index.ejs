@@ -79,15 +79,14 @@
                                                 title="Edit User">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                             </a>
-                                            <button 
-                                                type="button" 
-                                                class="reset-password-button p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                                                onclick="window.showResetPasswordModal('<%= user._id %>', '<%= user.name %>')"
+                                            <a 
+                                                href="/admin/users/reset-password/<%= user._id %>"
+                                                class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
                                                 title="Reset Password">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                                                 </svg>
-                                            </button>
+                                            </a>
                                             <% if (session && session.user && user._id !== session.user._id) { %>
                                                 <button 
                                                     type="button" 
@@ -127,6 +126,6 @@
         </div>
     </div>
 
-    <%- include('./reset-password-modal') %>
-    <%- include('./delete-user-modal') %>
+    <%# Removed reset password modal include %>
+    <%- include('./modal-delete') %>
 </div>

@@ -187,31 +187,67 @@ router.post('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /**
+ * GET route to display the reset password page - Admin only
+ * GET /users/reset-password/:id
+ */
+router.get('/reset-password/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userToReset = await User.findById(userId);
+
+    if (!userToReset) {
+      req.session.error = 'User not found';
+      return res.redirect('/admin/users');
+    }
+
+    // Retrieve and clear potential error from session (e.g., from failed POST)
+    const error = req.session.error;
+    req.session.error = null;
+
+    res.render('admin/users/reset-password', {
+      title: `Reset Password for ${userToReset.name}`,
+      user: req.session.user,
+      userToReset,
+      error: error, // Pass error from session if exists
+      // csrfToken: req.csrfToken() // Optional: Add CSRF token if using csurf
+    });
+
+  } catch (error) {
+    console.error('Error fetching user for reset password page:', error);
+    req.session.error = 'Failed to load user data for password reset.';
+    res.redirect('/admin/users');
+  }
+});
+
+/**
  * Reset user password - Admin only
  * POST /users/reset-password/:id
  */
 router.post('/reset-password/:id', isAuthenticated, isAdmin, async (req, res) => {
+  const userId = req.params.id; // Get userId for use in redirects
   try {
-    const userId = req.params.id;
     const { newPassword, confirmPassword } = req.body;
     
     // Validate passwords match
     if (newPassword !== confirmPassword) {
       req.session.error = 'Passwords do not match';
-      return res.redirect('/admin/users'); // Updated path
+      // Redirect back to the reset password page for this user
+      return res.redirect(`/admin/users/reset-password/${userId}`); 
     }
 
     // Validate password length
     if (newPassword.length < 6) {
       req.session.error = 'Password must be at least 6 characters';
-      return res.redirect('/admin/users'); // Updated path
+      // Redirect back to the reset password page for this user
+      return res.redirect(`/admin/users/reset-password/${userId}`); 
     }
 
     // Get the user
     const user = await User.findById(userId);
     if (!user) {
       req.session.error = 'User not found';
-      return res.redirect('/admin/users'); // Updated path
+      // Redirect back to the reset password page for this user (though unlikely)
+      return res.redirect(`/admin/users/reset-password/${userId}`); 
     }
 
     // Hash the new password
@@ -224,11 +260,12 @@ router.post('/reset-password/:id', isAuthenticated, isAdmin, async (req, res) =>
     await User.db.put(user);
 
     req.session.success = 'Password reset successfully';
-    res.redirect('/admin/users'); // Updated path
+    res.redirect('/admin/users'); // Redirect to user list on success
   } catch (error) {
     console.error('Error resetting password:', error);
     req.session.error = error.message || 'Failed to reset password';
-    res.redirect('/admin/users'); // Updated path
+    // Redirect back to the reset password page for this user on error
+    res.redirect(`/admin/users/reset-password/${userId}`); 
   }
 });
 
