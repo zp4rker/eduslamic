@@ -239,18 +239,18 @@ router.get('/api/details/:id', isAuthenticated, isAdmin, async (req, res) => {
   }
 });
 
-// --- NEW: API endpoint to get data for manage students modal ---
 /**
- * Get data for managing students in class (for modal) - Admin only
- * GET /classes/api/manage/:id
+ * GET route to display the manage students page - Admin only
+ * GET /classes/manage/:id
  */
-router.get('/api/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
+router.get('/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const classId = req.params.id;
     const classObj = await Class.findById(classId);
 
     if (!classObj) {
-      return res.status(404).json({ error: 'Class not found' });
+      req.session.error = 'Class not found.';
+      return res.redirect('/admin/classes');
     }
 
     // Get all students
@@ -259,10 +259,21 @@ router.get('/api/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
     // Get students currently enrolled in this class
     const enrolledStudentIds = await StudentClass.findStudentsByClass(classId);
 
-    res.json({ classObj, allStudents, enrolledStudentIds });
+    const error = req.session.error;
+    req.session.error = null;
+
+    res.render('admin/classes/manage-students', {
+      user: req.session.user,
+      classObj,
+      allStudents,
+      enrolledStudentIds,
+      error,
+      success: null // Initialize success as null
+    });
   } catch (error) {
-    console.error('Error fetching data for manage students modal:', error);
-    res.status(500).json({ error: 'Failed to fetch data for managing students' });
+    console.error('Error fetching data for manage students page:', error);
+    req.session.error = 'Failed to load page data.';
+    res.redirect('/admin/classes');
   }
 });
 
@@ -271,14 +282,13 @@ router.get('/api/manage/:id', isAuthenticated, isAdmin, async (req, res) => {
  * POST /classes/:id/students
  */
 router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
+  const classId = req.params.id;
   try {
-    const classId = req.params.id;
-    const { studentIds } = req.body;
-
     // Get current students in class
     const currentStudentIds = await StudentClass.findStudentsByClass(classId);
 
     // Convert to array, handling case of no students selected
+    const { studentIds } = req.body;
     const newStudentIds = studentIds ? (Array.isArray(studentIds) ? studentIds : [studentIds]) : [];
 
     // Remove students that were unselected
@@ -300,9 +310,9 @@ router.post('/:id/students', isAuthenticated, isAdmin, async (req, res) => {
     res.redirect(`/admin/classes`);
   } catch (error) {
     console.error('Error updating students in class:', error);
-    // Redirect back to the main classes list with error
+    // Redirect back to the manage students page with error
     req.session.error = error.message || 'Failed to update students';
-    res.redirect(`/admin/classes`);
+    res.redirect(`/admin/classes/manage/${classId}`); // Redirect back to manage page on error
   }
 });
 

@@ -1,0 +1,60 @@
+<% var classObj = typeof classObj !== 'undefined' ? classObj : {}; %>
+<% var allStudents = typeof allStudents !== 'undefined' ? allStudents : []; %>
+<% var enrolledStudentIds = typeof enrolledStudentIds !== 'undefined' ? enrolledStudentIds : []; %>
+<% var error = typeof error !== 'undefined' ? error : null; %>
+<% var success = typeof success !== 'undefined' ? success : null; %>
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <%- include('../../partials/alerts', { success: success, error: error }) %>
+
+    <!-- Page Header -->
+    <div class="px-4 py-6 sm:px-0 mb-8">
+        <h1 class="text-3xl font-bold leading-tight text-gray-900">
+            Manage Students for <%= classObj.name %>
+        </h1>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+        <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Enroll Students</h2>
+        </div>
+        <!-- Student enrollment form -->
+        <form action="/admin/classes/<%= classObj._id %>/students" method="POST" class="px-6 py-6 space-y-4">
+            <div class="max-h-96 overflow-y-auto mb-4 border rounded p-4 bg-gray-50">
+                <p class="text-sm text-gray-700 mb-3 font-medium">Select students to enroll in this class:</p>
+                <% if (allStudents && allStudents.length > 0) { %>
+                    <div class="space-y-2">
+                        <% allStudents.forEach(student => { %>
+                            <% const isEnrolled = enrolledStudentIds.includes(student._id); %>
+                            <div class="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="student-<%= student._id %>"
+                                    name="studentIds"
+                                    value="<%= student._id %>"
+                                    <%= isEnrolled ? 'checked' : '' %>
+                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                >
+                                <label for="student-<%= student._id %>" class="ml-3 block text-sm text-gray-900">
+                                    <%= student.name %>
+                                </label>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p class="mt-1 text-gray-500 italic">No students available to enroll.</p>
+                <% } %>
+            </div>
+
+            <div class="pt-4 flex justify-end space-x-3">
+                <a href="/admin/classes" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

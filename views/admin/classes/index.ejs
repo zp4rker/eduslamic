@@ -49,13 +49,13 @@
                                                 title="View Details">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                             </button>
-                                            <button
-                                                type="button"
-                                                class="manage-students-button p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
-                                                data-id="<%= classObj._id %>"
+                                            <!-- UPDATED: Changed button to link for Manage Students -->
+                                            <a
+                                                href="/admin/classes/manage/<%= classObj._id %>"
+                                                class="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
                                                 title="Manage Students">
                                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                            </button>
+                                            </a>
                                             <a 
                                                 href="/admin/classes/edit/<%= classObj._id %>" 
                                                 class="p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
@@ -99,7 +99,7 @@
 
     <!-- REMOVED: Include add-class-modal -->
     <%- include('./view-class-modal') %>
-    <%- include('./manage-students-modal') %>
+    <!-- REMOVED: Include manage-students-modal -->
     <%- include('./delete-class-modal') %>
 </div>
 
@@ -117,16 +117,7 @@
         });
     });
 
-    // --- Manage Students Modal --- 
-    // Assuming openManageModal is defined in manage-students-modal.ejs
-    document.querySelectorAll('.manage-students-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const classId = this.dataset.id;
-            if(typeof openManageModal === 'function') {
-                openManageModal(classId);
-            }
-        });
-    });
+    // --- REMOVED: Manage Students Modal Script ---
 
     // --- Delete Class Modal --- (Handled by onclick)
 </script>
