@@ -19,8 +19,8 @@ router.get('/', isAuthenticated, (req, res) => {
   res.render('profile', {
     user: req.session.user,
     roles: ROLES,
-    success: successMessage, // Pass session success message
-    error: errorMessage // Pass session error message
+    success: successMessage,
+    error: errorMessage
   });
 });
 
@@ -43,8 +43,8 @@ router.post('/update', isAuthenticated, async (req, res) => {
     res.redirect('/profile');
   } catch (error) {
     console.error('Profile update error:', error);
-    req.session.error = error.message; // Store error in session
-    res.redirect('/profile'); // Redirect without query param
+    req.session.error = error.message;
+    res.redirect('/profile');
   }
 });
 
@@ -57,16 +57,14 @@ router.post('/password', isAuthenticated, async (req, res) => {
     const { currentPassword, newPassword, confirmPassword } = req.body;
     const userId = req.session.user._id;
     
-    // Validate new password
     if (!newPassword || newPassword.length < 6) {
-      req.session.error = 'New password must be at least 6 characters'; // Store error in session
-      return res.redirect('/profile'); // Redirect without query param
+      req.session.error = 'New password must be at least 6 characters';
+      return res.redirect('/profile');
     }
     
-    // Check if passwords match
     if (newPassword !== confirmPassword) {
-      req.session.error = 'New passwords do not match'; // Store error in session
-      return res.redirect('/profile'); // Redirect without query param
+      req.session.error = 'New passwords do not match';
+      return res.redirect('/profile');
     }
     
     // Update password
@@ -76,8 +74,8 @@ router.post('/password', isAuthenticated, async (req, res) => {
     res.redirect('/profile');
   } catch (error) {
     console.error('Password update error:', error);
-    req.session.error = error.message; // Store error in session
-    res.redirect('/profile'); // Redirect without query param
+    req.session.error = error.message;
+    res.redirect('/profile');
   }
 });
 
@@ -107,8 +105,8 @@ router.post('/role/:userId', isAuthenticated, isAdmin, async (req, res) => {
     res.redirect('/');
   } catch (error) {
     console.error('Role update error:', error);
-    req.session.error = error.message; // Store error in session
-    res.redirect('/'); // Redirect without query param
+    req.session.error = error.message;
+    res.redirect('/');
   }
 });
 

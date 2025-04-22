@@ -96,7 +96,7 @@ class User {
         email: userData.email,
         phone: userData.phone,
         password: hashedPassword,
-        roles: roles, // Changed from role to roles (array)
+        roles: roles,
         createdAt: new Date().toISOString()
       };
 

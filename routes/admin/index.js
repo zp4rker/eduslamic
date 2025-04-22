@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 // Import sub-routers
-const classRoutes = require('./classes'); // Updated path
-const studentRoutes = require('./students'); // Updated path
-const userRoutes = require('./users'); // Updated path
+const classRoutes = require('./classes');
+const studentRoutes = require('./students');
+const userRoutes = require('./users');
 
 // Mount sub-routers
 router.use('/classes', classRoutes);

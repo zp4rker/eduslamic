@@ -17,28 +17,28 @@ async function initSampleData() {
         email: 'admin@example.com',
         phone: '1234567890',
         password: 'admin123',
-        roles: [ROLES.ADMIN] // Changed from role to roles array
+        roles: [ROLES.ADMIN]
       },
       {
         name: 'Teacher User',
         email: 'teacher@example.com',
         phone: '2345678901',
         password: 'teacher123',
-        roles: [ROLES.TEACHER] // Changed from role to roles array
+        roles: [ROLES.TEACHER]
       },
       {
         name: 'Parent User',
         email: 'parent@example.com',
         phone: '3456789012',
         password: 'parent123',
-        roles: [ROLES.PARENT] // Changed from role to roles array
+        roles: [ROLES.PARENT]
       },
       {
         name: 'Multi Role User', // Example of a user with multiple roles
         email: 'multi@example.com',
         phone: '4567890123',
         password: 'multi123',
-        roles: [ROLES.TEACHER, ROLES.PARENT] // Assign multiple roles
+        roles: [ROLES.TEACHER, ROLES.PARENT]
       }
     ];
 
@@ -50,7 +50,7 @@ async function initSampleData() {
       if (!existingUser) {
         const rolesString = userData.roles.join(', ');
         console.log(`Creating default user with roles: ${rolesString}...`);
-        await User.create(userData); // User.create now expects roles array
+        await User.create(userData);
         console.log(`Default user created successfully`);
         console.log(`Email: ${userData.email}`);
         console.log(`Password: ${userData.password}`);
