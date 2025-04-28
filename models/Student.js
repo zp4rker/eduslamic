@@ -205,6 +205,15 @@ class Student {
       for (const classId of classIds) {
         const classObj = await Class.findById(classId);
         if (classObj) {
+          // Fetch and add teacher information to each class
+          if (classObj.teacherId) {
+            const teacher = await User.findById(classObj.teacherId);
+            if (teacher) {
+              // Remove sensitive information
+              const { password, ...teacherData } = teacher;
+              classObj.teacher = teacherData;
+            }
+          }
           classes.push(classObj);
         }
       }

@@ -5,6 +5,7 @@ const { User, ROLES } = require('../../models/User');
 const StudentParent = require('../../models/StudentParent');
 const { isAuthenticated, isAdmin } = require('../../middleware/auth');
 const StudentClass = require('../../models/StudentClass');
+const Class = require('../../models/Class');
 
 router.get('/', isAuthenticated, isAdmin, async (req, res) => {
   try {
@@ -40,6 +41,44 @@ router.get('/', isAuthenticated, isAdmin, async (req, res) => {
       error: 'Failed to load students',
       values: {}
     });
+  }
+});
+
+router.get('/view/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const studentProfile = await Student.getCompleteProfile(studentId);
+
+    if (!studentProfile) {
+      req.session.error = 'Student not found.';
+      return res.redirect('/admin/students');
+    }
+
+    // Format date of birth if available
+    if (studentProfile.dateOfBirth) {
+      const dob = new Date(studentProfile.dateOfBirth);
+      if (!isNaN(dob.getTime())) {
+        studentProfile.formattedDob = dob.toLocaleDateString();
+      }
+    }
+
+    const success = req.session.success;
+    const error = req.session.error;
+    req.session.success = null;
+    req.session.error = null;
+
+    res.render('admin/students/view', {
+      user: req.session.user,
+      student: studentProfile,
+      parents: studentProfile.parents || [],
+      classes: studentProfile.classes || [],
+      success,
+      error
+    });
+  } catch (error) {
+    console.error('Error fetching student details:', error);
+    req.session.error = 'Failed to load student details.';
+    res.redirect('/admin/students');
   }
 });
 
@@ -106,6 +145,28 @@ router.get('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
       return res.redirect('/admin/students');
     }
 
+    // Get enrolled classes with teacher information
+    const classIds = await StudentClass.findClassesByStudent(studentId);
+    const enrolledClasses = [];
+    
+    for (const classId of classIds) {
+      const classObj = await Class.findById(classId);
+      if (classObj) {
+        // Add teacher name if available
+        if (classObj.teacherId) {
+          const teacher = await User.findById(classObj.teacherId);
+          if (teacher) {
+            classObj.teacherName = teacher.name;
+          } else {
+            classObj.teacherName = 'Unknown';
+          }
+        } else {
+          classObj.teacherName = 'Not Assigned';
+        }
+        enrolledClasses.push(classObj);
+      }
+    }
+
     const success = req.session.success;
     const error = req.session.error;
     const values = req.session.values || {};
@@ -118,6 +179,7 @@ router.get('/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
       student,
       parents,
       assignedParentIds: assignedParentIds.map(id => id.toString()),
+      enrolledClasses,
       success,
       error,
       values
@@ -212,7 +274,7 @@ router.get('/api/details/:id', isAuthenticated, isAdmin, async (req, res) => {
         name: studentProfile.name,
         formattedDob: formattedDob
       },
-      parent: studentProfile.parents && studentProfile.parents.length > 0 ? studentProfile.parents[0] : null,
+      parents: studentProfile.parents || [],
       classes: studentProfile.classes || []
     };
 
@@ -256,6 +318,51 @@ router.get('/api/search', isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error searching students for API:', error);
     res.status(500).json({ error: error.message || 'Failed to search students' });
+  }
+});
+
+/**
+ * Unenroll a student from a class - Admin only
+ * DELETE /students/:studentId/classes/:classId
+ */
+router.delete('/:studentId/classes/:classId', isAuthenticated, isAdmin, async (req, res) => {
+  const { studentId, classId } = req.params;
+  try {
+    // Check if student exists
+    const student = await Student.findById(studentId);
+    if (!student) {
+      req.session.error = 'Student not found.';
+      return res.status(404).json({ success: false, error: req.session.error });
+    }
+
+    // Check if class exists
+    const classObj = await Class.findById(classId);
+    if (!classObj) {
+      req.session.error = 'Class not found.';
+      return res.status(404).json({ success: false, error: req.session.error });
+    }
+
+    // Check if student is enrolled in the class
+    const isEnrolled = await StudentClass.isEnrolled(studentId, classId);
+    if (!isEnrolled) {
+      req.session.error = 'Student is not enrolled in this class.';
+      return res.status(400).json({ success: false, error: req.session.error });
+    }
+
+    // Unenroll the student
+    const removed = await Student.removeFromClass(studentId, classId);
+
+    if (removed) {
+      req.session.success = 'Student unenrolled successfully';
+      res.status(200).json({ success: true, message: req.session.success });
+    } else {
+      req.session.error = 'Failed to unenroll student from the class.';
+      res.status(500).json({ success: false, error: req.session.error });
+    }
+  } catch (error) {
+    console.error('Error unenrolling student from class:', error);
+    req.session.error = error.message || 'Failed to unenroll student due to a server error';
+    res.status(500).json({ success: false, error: req.session.error });
   }
 });
 

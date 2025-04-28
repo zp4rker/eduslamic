@@ -1,10 +1,8 @@
 <% var success = typeof success !== 'undefined' ? success : null; %>
 <% var error = typeof error !== 'undefined' ? error : null; %>
-<% var values = typeof values !== 'undefined' ? values : {}; %>
 <% var student = typeof student !== 'undefined' ? student : {}; %>
 <% var parents = typeof parents !== 'undefined' ? parents : []; %>
-<% var assignedParentIds = typeof assignedParentIds !== 'undefined' ? assignedParentIds : []; %>
-<% var enrolledClasses = typeof enrolledClasses !== 'undefined' ? enrolledClasses : []; %>
+<% var classes = typeof classes !== 'undefined' ? classes : []; %>
 
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <%- include('../../partials/alerts', { success: success, error: error }) %>
@@ -13,9 +11,22 @@
     <div class="px-4 py-6 sm:px-0 mb-8">
         <div class="flex justify-between items-center">
             <h1 class="text-3xl font-bold leading-tight text-gray-900">
-                Edit Student: <%= student.name %>
+                Student Profile: <%= student.name %>
             </h1>
-            <!-- Removed Back to Students button -->
+            <div class="flex items-center space-x-3">
+                <a href="/admin/students/edit/<%= student._id %>" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    Edit Student
+                </a>
+                <a href="/admin/students" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Students
+                </a>
+            </div>
         </div>
     </div>
 
@@ -24,59 +35,72 @@
         <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
             <h2 class="text-xl font-semibold text-gray-800">Student Details</h2>
         </div>
-        <form action="/admin/students/edit/<%= student._id %>" method="POST" class="px-6 py-6 space-y-4">
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Full Name *</label>
-                <input type="text" id="name" name="name" value="<%= values.name || student.name || '' %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-
-            <div>
-                <label for="dateOfBirth" class="block text-sm font-medium text-gray-700">Date of Birth *</label>
-                <%
-                    let dobValue = '';
-                    if (values.dateOfBirth) {
-                        dobValue = values.dateOfBirth;
-                    } else if (student.dateOfBirth) {
-                        try {
-                            dobValue = new Date(student.dateOfBirth).toISOString().split('T')[0];
-                        } catch (e) {
-                            // Handle potential invalid date format if necessary
-                        }
-                    }
-                %>
-                <input type="date" id="dateOfBirth" name="dateOfBirth" value="<%= dobValue %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-
-            <div>
-                <label for="parentIds" class="block text-sm font-medium text-gray-700">Assign Parent(s)</label>
-                <!-- Removed Tailwind classes like border, shadow, focus rings as Tagify container handles styling -->
-                <input id="parentIds" name="parentIds" value="" class="mt-1 block w-full">
-                <p class="text-sm text-gray-500 mt-1">Type to search and select parents.</p>
-            </div>
-
-            <div class="pt-2 flex justify-end space-x-3">
-                <a href="/admin/students" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                    Cancel
-                </a>
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                    Update Student
-                </button>
-            </div>
-        </form>
+        <div class="px-6 py-6">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Name</dt>
+                    <dd class="mt-1 text-sm text-gray-900"><%= student.name %></dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
+                    <dd class="mt-1 text-sm text-gray-900"><%= student.formattedDob || 'Not set' %></dd>
+                </div>
+                <div class="sm:col-span-2">
+                    <dt class="text-sm font-medium text-gray-500">Created At</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        <%= new Date(student.createdAt).toLocaleDateString() %> <%= new Date(student.createdAt).toLocaleTimeString() %>
+                    </dd>
+                </div>
+            </dl>
+        </div>
     </div>
 
-    <!-- Enrolled Classes Section -->
+    <!-- Parents Card -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 mt-8">
+        <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Assigned Parents</h2>
+        </div>
+        <div class="px-6 py-6">
+            <% if (parents && parents.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="border-b border-gray-300">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% parents.forEach(parent => { %>
+                                <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= parent.name %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= parent.email %></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= parent.phone || 'Not set' %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p class="text-gray-500 italic">No parents assigned to this student.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Classes Card -->
     <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 mt-8">
         <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
             <h2 class="text-xl font-semibold text-gray-800">Enrolled Classes</h2>
         </div>
         <div class="px-6 py-6">
-            <% if (enrolledClasses && enrolledClasses.length > 0) { %>
-                <div class="overflow-x-auto mb-6">
+            <% if (classes && classes.length > 0) { %>
+                <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="border-b border-gray-300">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Class Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Teacher</th>
                                 <!-- Empty header for actions alignment -->
                                 <th scope="col" class="relative px-6 py-3">
@@ -85,11 +109,14 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <% enrolledClasses.forEach(classObj => { %>
+                            <% classes.forEach(classObj => { %>
                                 <tr class="hover:bg-gray-50 transition duration-150 ease-in-out" id="class-row-<%= classObj._id %>">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= classObj.name %></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <%= classObj.teacherName || (classObj.teacher ? classObj.teacher.name : 'Not Assigned') %>
+                                        <%= classObj.description ? (classObj.description.length > 50 ? classObj.description.substring(0, 50) + '...' : classObj.description) : 'No description' %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <%= classObj.teacher ? classObj.teacher.name : 'Not Assigned' %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end space-x-2">
@@ -148,41 +175,7 @@
     </div>
 </div>
 
-<!-- Add Tagify CSS and JS -->
-<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
-<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
-
 <script>
-    // Prepare data for Tagify
-    const parentsData = <%- JSON.stringify(parents.map(p => ({ value: p._id.toString(), name: `${p.name} (${p.email})` }))) %>;
-    const assignedParentIdsData = <%- JSON.stringify(assignedParentIds) %>;
-
-    // Find the full parent objects for the initially assigned IDs
-    const initialTags = assignedParentIdsData
-        .map(id => parentsData.find(p => p.value === id))
-        .filter(p => p); // Filter out any potential nulls if an ID doesn't match
-
-    // Get the input element
-    const input = document.getElementById('parentIds');
-
-    // Initialize Tagify
-    const tagify = new Tagify(input, {
-        tagTextProp: 'name', // <-- Add this line to display the 'name' property
-        whitelist: parentsData, // List of allowed tags
-        originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','), // Submit comma-separated IDs
-        dropdown: {
-            mapValueTo: 'name', // <-- Add this to display 'name' in suggestions
-            maxItems: 10,           // Max items shown in dropdown
-            classname: "tags-look", // Optional: Classname for dropdown
-            enabled: 0,             // Start without showing dropdown
-            closeOnSelect: false    // Keep dropdown open after selection
-        },
-        enforceWhitelist: true // Only allow tags from the whitelist
-    });
-
-    // Set initial value
-    tagify.addTags(initialTags);
-
     // Unenroll Modal Functions
     const unenrollModal = document.getElementById('unenroll-modal');
     const unenrollModalContent = unenrollModal.querySelector('.bg-white');
